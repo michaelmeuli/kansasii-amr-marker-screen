@@ -54,9 +54,12 @@ Then in Jalview: **File → Input Alignment** `$ARM_DIR/work/aln/<gene>.codon.al
 (coding genes) or `$ARM_DIR/work/aln/<gene>.nt.aln.fasta` (non-coding genes such as
 `rrl` and `rrs`, which have no codon alignment),
 then **File → Load Features** `$ARM_DIR/work/report/<gene>.jalview_features.txt`.
-Features are coloured by evidence level (red = validated in *M. kansasii*,
-orange = validated in other NTM, amber = other species, green = DO_NOT_CALL
-species polymorphisms you should expect to see and ignore).
+Each marker nucleotide is coloured by the base the sequence carries (A green,
+C yellow-orange, G red, T blue, N/other grey), so a mutation shows as a colour change
+within the marker window. The evidence level is in the feature description (hover).
+For coding genes, `<gene>.aa.jalview_features.txt` (coloured by amino acid) and
+`<gene>.aa.calls.jalview_features.txt` (coloured by call: MUT / OTHER / wt / NOCALL ...)
+use protein coordinates and go with `<gene>.aa.aln.fasta`.
 
 For scripted analysis use `$ARM_DIR/work/report/marker_calls.tsv`, one row per
 marker × sample with `differs` = YES / SYN / no / NOCALL:
@@ -89,7 +92,7 @@ analysis. Without the metadata file only the identity/coverage checks run.
 |---|---|
 | `gene`, `drug` | Gene and the drug the marker is associated with |
 | `marker` | Literature mutation (wild-type aa, position, mutant aa, e.g. `E92D`) or nucleotide marker |
-| `evidence` | Support level (`VALIDATED`, `VALIDATED_OTHER_NTM`, `VALIDATED_OTHER_SPECIES`, `SUGGESTIVE`, `DO_NOT_CALL`, ...); sets the Jalview colour |
+| `evidence` | Support level (`VALIDATED`, `VALIDATED_OTHER_NTM`, `VALIDATED_OTHER_SPECIES`, `SUGGESTIVE`, `DO_NOT_CALL`, ...); shown in the Jalview feature description |
 | `numbering_ref` | External reference the marker's numbering comes from (e.g. `MTB_GIDB_PROT`) |
 | `ext_position` | Position in that external numbering |
 | `mkn_position` | Same residue in *M. kansasii* (ATCC 12478) coordinates |
@@ -185,8 +188,7 @@ time you run this. The consensus numbering paper for mycobacterial rpoB is
 
 ### Evidence levels
 
-The `evidence` column in `markers.tsv` sets the Jalview colour (`COLOURS` in
-`05_annotate.py`). `evidence_species` says where the evidence was observed and `doi`
+The `evidence` column in `markers.tsv` is shown in the Jalview feature description. `evidence_species` says where the evidence was observed and `doi`
 gives the paper.
 
 | Level | Meaning |

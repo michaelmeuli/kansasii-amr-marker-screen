@@ -62,19 +62,39 @@ for i, b1 in enumerate(_B):
         for k, b3 in enumerate(_B):
             CODONS[b1 + b2 + b3] = _AA[i * 16 + j * 4 + k]
 
-# Jalview feature colours, keyed by evidence level
-COLOURS = {
-    "VALIDATED": "e41a1c",
-    "VALIDATED_OTHER_NTM": "ff7f00",
-    "VALIDATED_OTHER_SPECIES": "ffbf00",
-    "VALIDATED_N1": "ff7f00",
-    "SUGGESTIVE": "999999",
-    "REGION": "80b1d3",
-    "DO_NOT_CALL": "4daf4a",
-    "NEGATIVE_FINDING": "cccccc",
-    "GAP": "cccccc",
-    "HYPERMUTATOR": "984ea3",
-    "SCREENED_NEGATIVE": "cccccc",
+# Jalview marker features are coloured by the nucleotide the sequence carries
+BASE_COLOURS = {
+    "A": "64f73f",  # green
+    "C": "ffb340",  # yellow-orange
+    "G": "e41a1c",  # red
+    "T": "3c88ee",  # blue
+    "N": "999999",  # N / other IUPAC
+}
+
+# protein-coordinate Jalview features: by amino acid (Zappo-like physico-chemical classes)
+_AA_CLASSES = {
+    "ffafaf": "ILVAM",  # aliphatic / hydrophobic
+    "ffc800": "FWY",    # aromatic
+    "6464ff": "KRH",    # positive
+    "ff0000": "DE",     # negative
+    "00ff00": "STNQ",   # hydrophilic
+    "ff00ff": "PG",     # conformationally special
+    "ffff00": "C",      # cysteine
+}
+AA_COLOURS = {aa: col for col, aas in _AA_CLASSES.items() for aa in aas}
+AA_COLOURS["STOP"] = "000000"
+AA_COLOURS["X"] = "999999"
+
+# ... or by call state (wt / MUT / OTHER ...)
+STATE_COLOURS = {
+    "MUT": "e41a1c",
+    "OTHER": "ff7f00",
+    "DIFF": "ffbf00",
+    "SYN": "80b1d3",
+    "wt": "e8e8e8",
+    "NOCALL": "4d4d4d",
+    "UNVERIFIED": "984ea3",
+    "REF": "b3b3b3",
 }
 
 
@@ -283,6 +303,7 @@ def main() -> None:
             is_cds = os.path.exists(codon)
 
             feats: list[tuple[dict[str, str], int, int, str, int]] = []
+            calls: dict[tuple[int, str], str] = {}  # (feature index, sequence) -> state
             for m in markers[gene]:
                 nref, pos = m["numbering_ref"], m["position"]
                 if nref == "NONE" or pos == "NA":
@@ -407,31 +428,103 @@ def main() -> None:
                     cw.writerow(out_row)
                     if qc == "ok":
                         pw.writerow(out_row)
+                    if differs == "NOCALL":
+                        calls[(len(feats) - 1, sname)] = "NOCALL"
+                    elif aa_call:
+                        calls[(len(feats) - 1, sname)] = aa_call
+                    else:
+                        calls[(len(feats) - 1, sname)] = {"YES": "DIFF", "SYN": "SYN"}.get(differs, "wt")
 
             # ---- Jalview features file -------------------------------------
             jf = os.path.join(args.outdir, f"{tag}.jalview_features.txt")
-            with open(jf, "w", encoding="utf-8") as fh:
-                used = {m["evidence"] for m, *_ in feats}
-                for ev in sorted(used):
-                    fh.write(f"{ev}\t{COLOURS.get(ev, '777777')}\n")
-                fh.write("\nSTARTGROUP\tAMR\n")
-                for m, c_lo, c_hi, ref_state, mkn_p in feats:
-                    desc = f"{m['drug']} | {m['marker']} | {m['evidence']} | {m['evidence_species']} | doi:{m['doi']}"
-                    # Jalview feature coords are 1-based on the named sequence,
-                    # in UNGAPPED residue numbering - so emit per sequence.
-                    for sname, saln in recs:
-                        smap = {}
-                        u = 0
-                        for col, ch in enumerate(saln):
-                            if ch != "-":
-                                u += 1
-                                smap[col] = u
-                        s_lo, s_hi = smap.get(c_lo), smap.get(c_hi)
-                        if s_lo is None:
+            # Jalview feature coords are 1-based on the named sequence, in UNGAPPED
+            # residue numbering, so build the column -> residue index map per sequence.
+            col_idx: dict[str, dict[int, int]] = {}
+            for sname, saln in recs:
+                smap: dict[int, int] = {}
+                u = 0
+                for col, ch in enumerate(saln):
+                    if ch != "-":
+                        u += 1
+                        smap[col] = u
+                col_idx[sname] = smap
+            lines: list[str] = []
+            used: set[str] = set()
+            for m, c_lo, c_hi, ref_state, mkn_p in feats:
+                desc = f"{m['drug']} | {m['marker']} | {m['evidence']} | {m['evidence_species']} | doi:{m['doi']}"
+                # one single-residue feature per marker nucleotide, typed by the base that
+                # sequence carries there, so the colour shows the allele
+                for sname, saln in recs:
+                    for col in range(c_lo, c_hi + 1):
+                        idx = col_idx[sname].get(col)
+                        if idx is None:
                             continue
-                        fh.write(f"{desc}\t{sname}\t-1\t{s_lo}\t{s_hi or s_lo}\t{m['evidence']}\n")
+                        base = saln[col].upper().replace("U", "T")
+                        btype = base if base in "ACGT" else "N"
+                        used.add(btype)
+                        lines.append(f"{desc}\t{sname}\t-1\t{idx}\t{idx}\t{btype}\n")
+            with open(jf, "w", encoding="utf-8") as fh:
+                for btype in sorted(used):
+                    fh.write(f"{btype}\t{BASE_COLOURS[btype]}\n")
+                fh.write("\nSTARTGROUP\tAMR\n")
+                fh.writelines(lines)
                 fh.write("ENDGROUP\tAMR\n")
             print(f"[ok] {tag}: {len(feats)} markers placed -> {jf}")
+
+            # ---- protein-coordinate features (for <gene>.aa.aln.fasta) -------
+            aa_path = os.path.join(args.aln_dir, f"{tag}.aa.aln.fasta")
+            if is_cds and os.path.exists(aa_path):
+                aa_recs = read_fasta(aa_path)
+                aa_by_name = dict(aa_recs)
+                aa_ref = aa_recs[0][1]
+                aa_idx: dict[str, dict[int, int]] = {}
+                for sname, saa in aa_recs:
+                    amap: dict[int, int] = {}
+                    u = 0
+                    for col, ch in enumerate(saa):
+                        if ch != "-":
+                            u += 1
+                            amap[col] = u
+                    aa_idx[sname] = amap
+                by_aa: list[str] = []
+                by_state: list[str] = []
+                used_aa: set[str] = set()
+                used_state: set[str] = set()
+                for fi, (m, c_lo, c_hi, _rs, _mp) in enumerate(feats):
+                    # only codon-aligned windows map to protein columns
+                    if c_lo % 3 or (c_hi - c_lo + 1) % 3:
+                        continue
+                    desc = f"{m['drug']} | {m['marker']} | {m['evidence']} | {m['evidence_species']} | doi:{m['doi']}"
+                    for sname, saa in aa_recs:
+                        for acol in range(c_lo // 3, c_hi // 3 + 1):
+                            idx = aa_idx[sname].get(acol)
+                            if idx is None or acol >= len(saa):
+                                continue
+                            aa = saa[acol].upper()
+                            atype = "STOP" if aa == "*" else (aa if aa in AA_COLOURS else "X")
+                            used_aa.add(atype)
+                            by_aa.append(f"{desc}\t{sname}\t-1\t{idx}\t{idx}\t{atype}\n")
+                            if sname == ref_name:
+                                stype = "REF"
+                            elif (fi, sname) in calls:
+                                stype = calls[(fi, sname)]
+                            elif "X" in aa or aa == "-":  # species refs (no per-sample call)
+                                stype = "NOCALL"
+                            else:
+                                stype = "wt" if aa == aa_ref[acol].upper() else "DIFF"
+                            used_state.add(stype)
+                            by_state.append(f"{desc}\t{sname}\t-1\t{idx}\t{idx}\t{stype}\n")
+                for suffix, body, used_t, cols in (
+                        ("aa.jalview_features.txt", by_aa, used_aa, AA_COLOURS),
+                        ("aa.calls.jalview_features.txt", by_state, used_state, STATE_COLOURS)):
+                    aa_out = os.path.join(args.outdir, f"{tag}.{suffix}")
+                    with open(aa_out, "w", encoding="utf-8") as fh:
+                        for t in sorted(used_t):
+                            fh.write(f"{t}\t{cols[t]}\n")
+                        fh.write("\nSTARTGROUP\tAMR\n")
+                        fh.writelines(body)
+                        fh.write("ENDGROUP\tAMR\n")
+                    print(f"[ok] {tag}: protein features -> {aa_out}")
 
     up = os.path.join(args.outdir, "unplaced_markers.tsv")
     with open(up, "w", newline="", encoding="utf-8") as fh:
