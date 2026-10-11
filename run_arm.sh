@@ -27,5 +27,6 @@ for fa in $ASM_GLOB; do
 done
 echo "processed $n new samples"
 
+"$HERE/03b_species_refs.sh"
 "$HERE/04_align.sh" "$THREADS"
 python3 "$HERE/05_annotate.py"

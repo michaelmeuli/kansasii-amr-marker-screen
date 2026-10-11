@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# 04_align.sh - build one MAFFT alignment per gene: reference + every sample.
+# 04_align.sh - build one MAFFT alignment per gene: reference + the other complex-species
+# references (03b_species_refs.sh) + every sample.
 #
 # Usage: ./04_align.sh [THREADS]
 #
@@ -22,6 +23,12 @@ for refgene in "$ARM"/work/ref_genes/*.fa; do
   tag=$(basename "$refgene" .fa)
   in="$ALN/$tag.input.fa"
   cat "$refgene" > "$in"
+  # other complex-species references directly under the kansasii REF, in species_refs.tsv order
+  while IFS=$'\t' read -r sp _acc _path; do
+    [[ -z "$sp" || "$sp" == \#* ]] && continue
+    r="$ARM/work/species_refs/REFSP_$sp/genes/$tag.fa"
+    [[ -e "$r" ]] && cat "$r" >> "$in"
+  done < "$HERE/species_refs.tsv"
   found=0
   for s in "$ARM"/work/samples/*/genes/"$tag".fa; do
     [[ -e "$s" ]] || continue

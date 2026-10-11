@@ -67,6 +67,13 @@ wild type, so for substitution markers named like `K43R` read `aa_call` (MUT / w
 relative to the marker's own wild-type and mutant residue) and `ref_aa_check` (does the
 reference carry wt, mut, or neither - `neither` means the position transfer is suspect).
 
+**Species references in the alignments.** Each per-gene alignment starts with `REF_<gene>`
+(*M. kansasii* ATCC 12478), followed by the type/reference strain of persicum, pseudokansasii,
+innocens, attenuatum, ostraviense and gastri (`species_refs.tsv`, extracted by
+`03b_species_refs.sh`, named `<gene>__REFSP_<species>`), then the samples. The `REFSP_*` rows get
+Jalview marker features but are not called in `marker_calls*.tsv`. A gene missing from a draft
+reference genome is simply absent for that species.
+
 **Sample/gene QC.** A call is only trusted when the sample is a non-contaminated member of the
 *M. kansasii* complex (`species` and `contamination_flag` from `output/screening_map_results.csv`,
 override with `--sample-meta`) and the gene was extracted with >= `--min-ident` (default 80) % BLAST

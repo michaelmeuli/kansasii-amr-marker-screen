@@ -19,7 +19,7 @@ INPUT=${3:?bam or contigs fasta}
 
 REF=$ARM/refs/reference.fna
 BED=$ARM/work/targets.bed
-OUT=$ARM/work/samples/$SAMPLE
+OUT=${OUT_DIR:-$ARM/work/samples/$SAMPLE}   # OUT_DIR: used by 03b_species_refs.sh
 MIN_DEPTH=${MIN_DEPTH:-10}          # positions below this are masked to N
 MIN_IDENT=${MIN_IDENT:-85}          # asm mode: minimum blast identity
 mkdir -p "$OUT"

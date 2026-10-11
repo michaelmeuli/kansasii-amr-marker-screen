@@ -18,6 +18,7 @@ prepare)
   [[ -s "$ARM/refs/reference.fna.bwt" ]] || bwa index "$ARM/refs/reference.fna"
   ;;
 finish)
+  "$HERE/03b_species_refs.sh"
   "$HERE/04_align.sh" "${SLURM_CPUS_PER_TASK:-4}"
   python3 "$HERE/05_annotate.py"
   ;;
