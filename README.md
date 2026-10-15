@@ -140,7 +140,7 @@ sbatch --wrap '...; ./run_arm_bam.sh finish'  # after the array: 04_align + 05_a
   every upstream indel, so slicing it with reference coordinates gives the wrong codons.
 - `07_compare_modes.py` joins both `marker_calls.tsv` on gene x marker x sample and writes
   `mode_comparison.tsv` and `mode_disagreements.tsv` (classes `agree`, `disagree`, `asm_only`,
-  `bam_only`, `both_nocall`; NOCALL is never a call). On the 131 Mkan329 samples: 3,550 shared
+  `bam_only`, `both_nocall`; NOCALL is never a call). On the 131 Mkan329 samples (BAM mode has not been rerun for the jc batch NR 134-186; assembly mode covers all 186): 3,550 shared
   calls, 0 disagreements. Reads fill gaps where the assembly extraction was partial (rrl, rrs,
   gyrA); the assembly gives rrl/rrs calls where read mapping is NOCALL (mapping to the rRNA genes
   is not deep or unique enough).
