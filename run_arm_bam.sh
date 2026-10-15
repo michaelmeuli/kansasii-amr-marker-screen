@@ -8,7 +8,7 @@
 set -euo pipefail
 export ARM_DIR=${ARM_DIR:-${KANSASII_ROOT:-/shares/sander.imm.uzh/MM/kansasii}/output/arm_bam}
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
-command -v bwa >/dev/null 2>&1 || export PATH=$PATH:/home/mimeul/data/conda/envs/snippy/bin
+command -v bwa >/dev/null 2>&1 || export PATH=$PATH:${CONDA_ENVS_DIR:-$HOME/data/conda/envs}/snippy/bin   # bwa lives in the snippy env
 
 case "${1:?prepare|finish}" in
 prepare)

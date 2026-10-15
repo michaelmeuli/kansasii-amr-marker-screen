@@ -10,7 +10,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 
 ID=${1:?sample id}
 THREADS=${2:-${SLURM_CPUS_PER_TASK:-4}}
-command -v bwa >/dev/null 2>&1 || export PATH=$PATH:/home/mimeul/data/conda/envs/snippy/bin
+command -v bwa >/dev/null 2>&1 || export PATH=$PATH:${CONDA_ENVS_DIR:-$HOME/data/conda/envs}/snippy/bin   # bwa lives in the snippy env
 R=$ROOT/runs/mkan329/assembly/results/$ID/0_trimming
 REF=$ARM/refs/reference.fna
 mkdir -p "$ARM/bam"

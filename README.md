@@ -31,8 +31,14 @@ Paths: reference downloads and all outputs live outside the repo in
 
 ```bash
 conda env create -f environment.yml     # once: env_arm (samtools bcftools bedtools blast mafft)
-sbatch submit_arm.sbatch                # 01 -> 02 -> 03 per new sample -> 04 -> 05
+sbatch submit_arm.sbatch                # 01 -> 02 -> 03 per new sample -> 03b -> 04 -> 05
+sbatch submit_arm_reannot.sbatch        # after the MIC analysis: 05 again (arm, arm_bam) -> 07 -> 08
 ```
+
+Call order: `01_fetch_reference.sh`, `02_make_targets.py`, `03_sample_seqs.sh` (once per sample),
+`03b_species_refs.sh`, `04_align.sh`, `05_annotate.py`; read-mapping variant `06_bam_sample.sh`
+instead of 03 (see below); then `07_compare_modes.py` and `08_mut_with_mic.py`, which need both
+modes and `output/mic/`. `run_arm.sh` / `run_arm_bam.sh` do the first group.
 
 **Step by step** (deps: samtools bcftools bedtools blast mafft python3; macse optional):
 
@@ -124,7 +130,9 @@ independent of the assembly, so the same 54 markers can also be genotyped from t
 
 ```bash
 ./run_arm_bam.sh prepare                    # once: shared refs/ symlink, targets, bwa index
-sbatch submit_arm_bam.sbatch                # array, one task per sample (06_bam_sample.sh)
+sbatch --array=0-$(( $(ls $KANSASII_ROOT/runs/mkan329/assembly/results | wc -l) - 1 ))%20 submit_arm_bam.sbatch
+                                            # array, one task per sample (06_bam_sample.sh); the
+                                            # default range 0-185 is the current 186 samples
 sbatch --wrap '...; ./run_arm_bam.sh finish'  # after the array: 04_align + 05_annotate (needs env_arm)
 ./07_compare_modes.py                       # asm vs bam
 ```
