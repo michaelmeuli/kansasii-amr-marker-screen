@@ -64,8 +64,12 @@ Each marker nucleotide is coloured by the base the sequence carries (A green,
 C yellow-orange, G red, T blue, N/other grey), so a mutation shows as a colour change
 within the marker window. The evidence level is in the feature description (hover).
 For coding genes, `<gene>.aa.jalview_features.txt` (coloured by amino acid) and
-`<gene>.aa.calls.jalview_features.txt` (coloured by call: MUT / OTHER / wt / NOCALL ...)
-use protein coordinates and go with `<gene>.aa.aln.fasta`.
+`<gene>.aa.calls.jalview_features.txt` (mutated positions only, typed `<call>:<aa>`, e.g.
+`MUT:R`; MUT red, OTHER/DIFF orange; wt, SYN, NOCALL and UNVERIFIED are not drawn)
+use protein coordinates and go with `<gene>.aa.aln.fasta`. MUT = marker's mutant residue,
+OTHER = neither wt nor mutant residue, DIFF = differs from the reference at a marker without
+wt/mut letters. The reference row is shown only where it carries the mutant allele (MUT, with
+"ref carries mutant" in the description) or neither allele (OTHER).
 
 For scripted analysis use `$ARM_DIR/work/report/marker_calls.tsv`, one row per
 marker × sample with `differs` = YES / SYN / no / NOCALL:

@@ -25,6 +25,14 @@ gene was extracted with >= --min-ident % BLAST identity and >= --min-cov coverag
 reference gene. Otherwise the `qc` column says why, `differs` is NOCALL and aa_call is empty.
 marker_calls.pass.tsv holds only the rows with qc == ok.
 
+<gene>.aa.calls.jalview_features.txt lists only mutated positions: features typed
+"<call>:<aa>" (e.g. MUT:R) for call MUT (red), OTHER or DIFF (orange). MUT = sample has the
+marker's mutant residue; OTHER = a residue that is neither the marker's wt nor mut; DIFF =
+marker without wt/mut letters whose amino acid differs from the reference. wt, SYN, NOCALL and
+UNVERIFIED get no feature. The reference row is flagged MUT when it carries the mutant allele
+(ref_aa_check == mut) and OTHER when it carries neither; SAMPLE MUT at such a marker is then
+non-discriminating (see below).
+
 `discriminating` is "no" when the reference strain carries the marker's mutant allele
 (ref_aa_check == mut; e.g. rpsL K43R, rrs A514C: ATCC 12478 has the "mutant" residue), so an
 aa_call of MUT only means "same as the reference" and is not evidence of resistance; "yes" when the
@@ -85,16 +93,13 @@ AA_COLOURS = {aa: col for col, aas in _AA_CLASSES.items() for aa in aas}
 AA_COLOURS["STOP"] = "000000"
 AA_COLOURS["X"] = "999999"
 
-# ... or by call state (wt / MUT / OTHER ...)
+# ... or by call state, for mutated positions only: MUT red, OTHER / DIFF orange.
+# Feature type is "<call>:<aa>" so the residue is visible; wt / SYN / NOCALL / UNVERIFIED
+# positions get no feature at all.
 STATE_COLOURS = {
     "MUT": "e41a1c",
     "OTHER": "ff7f00",
-    "DIFF": "ffbf00",
-    "SYN": "80b1d3",
-    "wt": "e8e8e8",
-    "NOCALL": "4d4d4d",
-    "UNVERIFIED": "984ea3",
-    "REF": "b3b3b3",
+    "DIFF": "ff7f00",
 }
 
 
@@ -303,6 +308,7 @@ def main() -> None:
             is_cds = os.path.exists(codon)
 
             feats: list[tuple[dict[str, str], int, int, str, int]] = []
+            feat_ref_check: dict[int, str] = {}  # feature index -> ref_check (wt/mut/neither/"")
             calls: dict[tuple[int, str], str] = {}  # (feature index, sequence) -> state
             for m in markers[gene]:
                 nref, pos = m["numbering_ref"], m["position"]
@@ -364,6 +370,7 @@ def main() -> None:
                 elif is_nt_marker:
                     rb = ref_state.upper()
                     ref_check = "wt" if rb == wt_aa else ("mut" if rb == mut_aa else "neither")
+                feat_ref_check[len(feats) - 1] = ref_check
 
                 # genomic window of this marker in the reference gene, for the mixed-site lookup
                 g_start, g_end, g_strand = coords.get(tag, (0, 0, "+"))
@@ -505,22 +512,37 @@ def main() -> None:
                             used_aa.add(atype)
                             by_aa.append(f"{desc}\t{sname}\t-1\t{idx}\t{idx}\t{atype}\n")
                             if sname == ref_name:
-                                stype = "REF"
+                                stype = "REF"  # replaced below by the reference's own call
                             elif (fi, sname) in calls:
                                 stype = calls[(fi, sname)]
                             elif "X" in aa or aa == "-":  # species refs (no per-sample call)
                                 stype = "NOCALL"
                             else:
                                 stype = "wt" if aa == aa_ref[acol].upper() else "DIFF"
-                            used_state.add(stype)
-                            by_state.append(f"{desc}\t{sname}\t-1\t{idx}\t{idx}\t{stype}\n")
+                            if sname == ref_name:
+                                # the reference is only flagged where it carries the mutant
+                                # allele (or neither wt nor mut); it is never "DIFF" from itself
+                                rc = feat_ref_check.get(fi, "")
+                                stype = {"mut": "MUT", "neither": "OTHER"}.get(rc, "")
+                            if stype not in STATE_COLOURS:  # wt / SYN / NOCALL / UNVERIFIED: no feature
+                                continue
+                            sdesc = desc
+                            if sname == ref_name and feat_ref_check.get(fi) == "mut":
+                                sdesc += " | ref carries mutant (non-discriminating)"
+                            ttype = f"{stype}:{atype}"
+                            used_state.add(ttype)
+                            by_state.append(f"{sdesc}\t{sname}\t-1\t{idx}\t{idx}\t{ttype}\n")
                 for suffix, body, used_t, cols in (
                         ("aa.jalview_features.txt", by_aa, used_aa, AA_COLOURS),
                         ("aa.calls.jalview_features.txt", by_state, used_state, STATE_COLOURS)):
                     aa_out = os.path.join(args.outdir, f"{tag}.{suffix}")
+                    if not body:
+                        if os.path.exists(aa_out):
+                            os.remove(aa_out)  # stale file from an earlier run
+                        continue
                     with open(aa_out, "w", encoding="utf-8") as fh:
                         for t in sorted(used_t):
-                            fh.write(f"{t}\t{cols[t]}\n")
+                            fh.write(f"{t}\t{cols[t.split(':')[0]]}\n")
                         fh.write("\nSTARTGROUP\tAMR\n")
                         fh.writelines(body)
                         fh.write("ENDGROUP\tAMR\n")
