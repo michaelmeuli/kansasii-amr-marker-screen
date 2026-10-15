@@ -309,6 +309,7 @@ def main() -> None:
 
             feats: list[tuple[dict[str, str], int, int, str, int]] = []
             feat_ref_check: dict[int, str] = {}  # feature index -> ref_check (wt/mut/neither/"")
+            feat_wt_mut: dict[int, tuple[str, str]] = {}  # feature index -> (wt_aa, mut_aa)
             calls: dict[tuple[int, str], str] = {}  # (feature index, sequence) -> state
             for m in markers[gene]:
                 nref, pos = m["numbering_ref"], m["position"]
@@ -371,6 +372,7 @@ def main() -> None:
                     rb = ref_state.upper()
                     ref_check = "wt" if rb == wt_aa else ("mut" if rb == mut_aa else "neither")
                 feat_ref_check[len(feats) - 1] = ref_check
+                feat_wt_mut[len(feats) - 1] = (wt_aa, mut_aa)
 
                 # genomic window of this marker in the reference gene, for the mixed-site lookup
                 g_start, g_end, g_strand = coords.get(tag, (0, 0, "+"))
@@ -518,7 +520,15 @@ def main() -> None:
                             elif "X" in aa or aa == "-":  # species refs (no per-sample call)
                                 stype = "NOCALL"
                             else:
-                                stype = "wt" if aa == aa_ref[acol].upper() else "DIFF"
+                                # species references: no per-sample call. Judge against the
+                                # marker's own wt/mut residues when it has them (the reference
+                                # strain may itself carry the mutant), else against the reference.
+                                wt_r, mut_r = feat_wt_mut.get(fi, ("", ""))
+                                if len(wt_r) == 1 and len(aa) == 1 and wt_r != mut_r:
+                                    stype = ("MUT" if aa == mut_r
+                                             else "wt" if aa == wt_r else "OTHER")
+                                else:
+                                    stype = "wt" if aa == aa_ref[acol].upper() else "DIFF"
                             if sname == ref_name:
                                 # the reference is only flagged where it carries the mutant
                                 # allele (or neither wt nor mut); it is never "DIFF" from itself
