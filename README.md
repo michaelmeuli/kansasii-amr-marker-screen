@@ -76,7 +76,7 @@ marker × sample with `differs` = YES / SYN / no / NOCALL:
 coding markers are compared at the amino-acid level (YES = residue differs from the
 reference, SYN = synonymous nucleotide change only), other markers at the nucleotide level;
 NOCALL = depth-masked N or alignment gap. Reference strain ATCC 12478 is *not* always the
-wild type, so for substitution markers named like `K43R` read `aa_call` (MUT / wt / OTHER,
+wild type (rpsL K43R: the type strain is streptomycin-resistant, see *Predicted resistance vs MIC*), so for substitution markers named like `K43R` read `aa_call` (MUT / wt / OTHER,
 relative to the marker's own wild-type and mutant residue) and `ref_aa_check` (does the
 reference carry wt, mut, or neither - `neither` means the position transfer is suspect).
 
@@ -170,6 +170,15 @@ panel has no streptomycin, so for the streptomycin markers only MHK rows can mat
 streptomycin markers are reference-polarity alleles (the ATCC 12478 reference carries the mutant
 residue/base), so `MUT` means "same as the reference", which is why rrs A514C is `MUT` in every sample.
 
+**rpsL K43R in the type strain is a real resistance allele, not an artefact.** ATCC 12478 (= CCUG 27787^T,
+the *M. kansasii* type strain) carries Arg at rpsL 43 and is documented as streptomycin-resistant
+(<https://www.ccug.se/strain?id=27787&t=27787T>). So `ref_aa_check = mut` / `discriminating = no` for
+K43R means "the reference is itself a K43R resistant strain", and samples called `MUT` share the
+phenotype-linked allele of the type strain; it is the *wild-type* (K43) samples that deviate from the
+reference. The 011, 014, 064, 065, 087 and 128 calls therefore are expected to be STR-resistant, but none of them
+has a streptomycin MIC, so this remains untested in the cohort. Do not read `MUT` here as a novel
+mutation relative to the reference.
+
 ## Coordinate transfer — the thing to understand
 
 Almost nothing in `markers.tsv` is in *M. kansasii* coordinates:
@@ -253,6 +262,10 @@ Targets added: `rpsL`, `gid` (gidB/rsmG), plus the streptomycin positions in
 helix-44 window — a variant there should be interpreted for both drugs. The
 only *M. kansasii*-specific observation is rrs A128G in a single isolate with
 streptomycin MIC >64 mg/L, which was never functionally confirmed.
+
+The ATCC 12478 reference (CCUG 27787^T) is itself streptomycin-resistant and carries the rpsL
+K43R allele, which is consistent with K43R being the dominant STR marker in Mtb. Its rpsL K43R / rrs A514C
+state is therefore a resistant baseline, not a wild-type one (see *Predicted resistance vs MIC*).
 
 ## Windows checkout
 
