@@ -22,18 +22,20 @@ is_coding () { for g in "${CODING[@]}"; do [[ "${1%%_c[0-9]*}" == "$g" ]] && ret
 for refgene in "$ARM"/work/ref_genes/*.fa; do
   tag=$(basename "$refgene" .fa)
   in="$ALN/$tag.input.fa"
-  cat "$refgene" > "$in"
-  # other complex-species references directly under the kansasii REF, in species_refs.tsv order
-  while IFS=$'\t' read -r sp _acc _path; do
+  # kansasii REF: >REF_<tag>|locus|NC_022663.1:s-e(+)  ->  ><tag>_REF_kansasii_NC022663
+  sed -E "1s/^>REF_[^|]*\|[^|]*\|([A-Z]+)_?([0-9]+)\.[0-9]+:.*/>${tag}_REF_kansasii_\1\2/" "$refgene" > "$in"
+  # other complex-species references directly under the kansasii REF, in species_refs.tsv order:
+  # ><tag>_REF_<species>_<GCF accession without version and underscore>
+  while IFS=$'\t' read -r sp acc _path; do
     [[ -z "$sp" || "$sp" == \#* ]] && continue
     r="$ARM/work/species_refs/REFSP_$sp/genes/$tag.fa"
-    [[ -e "$r" ]] && cat "$r" >> "$in"
+    acc_id=${acc%.*}; acc_id=${acc_id//_/}   # GCF_002086675.1 -> GCF002086675
+    [[ -e "$r" ]] && sed "1s/.*/>${tag}_REF_${sp}_${acc_id}/" "$r" >> "$in"
   done < "$HERE/species_refs.tsv"
-  found=0
-  # samples sorted by species then id; rows named <gene>__<id>_<species>
+  # control strains (LABEL set, e.g. Mkan329-126..133) first, then samples by species then id;
+  # rows named <gene>_<id>_<species|abbreviated label>
   python3 "$HERE/sort_samples.py" "$ROOT/output/screening_map_results.csv" "$ARM/work/samples" "$tag" >> "$in"
-  found=$(grep -c "^>.*__" "$in" || true)
-  found=$((found - 1 - $(grep -c "__REFSP_" "$in" || true)))
+  found=$(grep "^>" "$in" | grep -vc "^>${tag}_REF_" || true)
   if (( found == 0 )); then
     echo "[skip] $tag: reference only, no sample sequences"; continue
   fi

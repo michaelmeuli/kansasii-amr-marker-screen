@@ -60,7 +60,7 @@ ROOT = Path(os.environ.get("KANSASII_ROOT", "/shares/sander.imm.uzh/MM/kansasii"
 ARM = Path(os.environ.get("ARM_DIR", ROOT / "output" / "arm"))
 HERE = Path(__file__).resolve().parent
 
-SPECIES_REF_PREFIX = "REFSP_"  # other complex-species references in the alignment; never called
+SPECIES_REF_PREFIX = "REF_"  # other complex-species references (<gene>_REF_<species>_<GCF>); never called
 COMPLEX = {"kansasii", "persicum", "pseudokansasii", "innocens", "attenuatum", "ostraviense", "gastri"}
 
 CODONS: dict[str, str] = {}
@@ -165,9 +165,14 @@ def ungapped_to_column(aligned_seq: str) -> dict[int, int]:
     return m
 
 
-def sample_id(sname: str) -> str:
-    """Plain sample id from an alignment row name `<gene>__<id>_<species>` (ids contain no `_`)."""
-    return sname.split("__", 1)[-1].split("_", 1)[0]
+def row_suffix(sname: str, tag: str) -> str:
+    """Alignment row name `<gene>_<rest>` -> `<rest>` (gene tags such as folP_c1 contain `_`)."""
+    return sname[len(tag) + 1:] if sname.startswith(tag + "_") else sname
+
+
+def sample_id(sname: str, tag: str) -> str:
+    """Plain sample id from an alignment row name `<gene>_<id>_<species>` (ids contain no `_`)."""
+    return row_suffix(sname, tag).split("_", 1)[0]
 
 
 def load_meta(path: str) -> dict[str, tuple[str, str]]:
@@ -385,7 +390,7 @@ def main() -> None:
                             else (g_end - nt_hi + 1, g_end - nt_lo + 1))
 
                 for sname, saln in recs[1:]:
-                    if sname.split("__", 1)[-1].startswith(SPECIES_REF_PREFIX):
+                    if row_suffix(sname, tag).startswith(SPECIES_REF_PREFIX):
                         continue
                     s_state = saln[c_lo:c_hi + 1]
                     # missing data (depth-masked N or alignment gap) must never read as
@@ -393,7 +398,7 @@ def main() -> None:
                     s_up = s_state.upper()
                     s_aa = ""
                     aa_call = ""
-                    sid = sample_id(sname)
+                    sid = sample_id(sname, tag)
                     if (sid, tag) not in qc_cache:
                         qc_cache[(sid, tag)] = sample_qc(
                             sid, tag, meta, args.samples, args.min_ident,
