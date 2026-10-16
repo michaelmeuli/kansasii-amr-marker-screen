@@ -80,6 +80,8 @@ wild type (rpsL K43R: the type strain is streptomycin-resistant, see *Predicted 
 relative to the marker's own wild-type and mutant residue) and `ref_aa_check` (does the
 reference carry wt, mut, or neither - `neither` means the position transfer is suspect).
 
+**Row names and order.** Sample rows are named `<gene>__<sampleID>_<species>` (e.g. `gyrA__Mkan329-002_persicum`, species from `screening_map_results.csv`) and sorted by species, then ID (`sort_samples.py`). The calls TSVs keep `<gene>__<sampleID>`.
+
 **Species references in the alignments.** Each per-gene alignment starts with `REF_<gene>`
 (*M. kansasii* ATCC 12478), followed by the type/reference strain of persicum, pseudokansasii,
 innocens, attenuatum, ostraviense and gastri (`species_refs.tsv`, extracted by

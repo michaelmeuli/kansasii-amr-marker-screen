@@ -165,6 +165,11 @@ def ungapped_to_column(aligned_seq: str) -> dict[int, int]:
     return m
 
 
+def sample_id(sname: str) -> str:
+    """Plain sample id from an alignment row name `<gene>__<id>_<species>` (ids contain no `_`)."""
+    return sname.split("__", 1)[-1].split("_", 1)[0]
+
+
 def load_meta(path: str) -> dict[str, tuple[str, str]]:
     """sample id -> (species, contamination_flag) from screening_map_results.csv."""
     out: dict[str, tuple[str, str]] = {}
@@ -388,7 +393,7 @@ def main() -> None:
                     s_up = s_state.upper()
                     s_aa = ""
                     aa_call = ""
-                    sid = sname.split("__", 1)[-1]
+                    sid = sample_id(sname)
                     if (sid, tag) not in qc_cache:
                         qc_cache[(sid, tag)] = sample_qc(
                             sid, tag, meta, args.samples, args.min_ident,
@@ -429,7 +434,7 @@ def main() -> None:
                     # reference/species baseline, so the marker cannot be read as resistance
                     discriminating = {"wt": "yes", "mut": "no"}.get(ref_check, "")
                     out_row = [tag, m["drug"], m["marker"], m["evidence"], nref,
-                               pos, mkn_lo, c_lo + 1, ref_state, sname, s_state,
+                               pos, mkn_lo, c_lo + 1, ref_state, f"{tag}__{sid}", s_state,
                                differs, ref_aa, s_aa, wt_aa, mut_aa, ref_check, aa_call,
                                discriminating,
                                species, contam, f"{hit[0]:.2f}" if hit else "",
