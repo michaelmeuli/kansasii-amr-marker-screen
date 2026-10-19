@@ -3,7 +3,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=8G
 #SBATCH --time=04:00:00
-#SBATCH --output=%x-%j.log
+#SBATCH --output=/shares/sander.imm.uzh/MM/kansasii/output/arm/logs/%x-%j.log
 
 set -euo pipefail
 source "$(conda info --base)/etc/profile.d/conda.sh"
