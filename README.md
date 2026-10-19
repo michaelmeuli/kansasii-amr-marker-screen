@@ -277,3 +277,8 @@ state is therefore a resistant baseline, not a wild-type one (see *Predicted res
 - Scripts default to the cluster root `/shares/sander.imm.uzh/MM/kansasii`; set the
   `KANSASII_ROOT` environment variable to point elsewhere (e.g. a mapped drive).
 - The shell steps and sbatch only run on the cluster (or WSL).
+
+## Provenance
+
+The sbatch files write `MANIFEST.txt` (commit, clean/dirty flag, script, conda env hash, inputs) into the output
+directory when they finish; see `kansasii-docs/docs/PROVENANCE.md`. Project index: `kansasii-docs/README.md`.
