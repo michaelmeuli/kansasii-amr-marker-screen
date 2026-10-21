@@ -20,7 +20,7 @@ Markers with numbering_ref = NONE are reported but not placed; they need manual
 curation against the original paper's amplicon.
 
 Sample/gene QC: a call is only trusted when the sample is a non-contaminated member of the
-M. kansasii complex (species + contamination_flag from screening_map_results.csv) AND the
+M. kansasii complex (species + contamination_flag + excluded from screening_map_results.csv) AND the
 gene was extracted with >= --min-ident % BLAST identity and >= --min-cov coverage of the
 reference gene. Otherwise the `qc` column says why, `differs` is NOCALL and aa_call is empty.
 marker_calls.pass.tsv holds only the rows with qc == ok.
@@ -176,14 +176,17 @@ def sample_id(sname: str, tag: str) -> str:
 
 
 def load_meta(path: str) -> dict[str, tuple[str, str]]:
-    """sample id -> (species, contamination_flag) from screening_map_results.csv."""
+    """sample id -> (species, exclusion) from screening_map_results.csv; exclusion is "contaminated" (contamination_flag),
+    "low_cgmlst_coverage" (`excluded` = true for another reason: < 90 % of the cgMLST loci called) or ""."""
     out: dict[str, tuple[str, str]] = {}
     if not os.path.exists(path):
         print(f"[warn] no sample metadata at {path}: species/contamination QC skipped", file=sys.stderr)
         return out
     with open(path, encoding="utf-8", newline="") as fh:
         for row in csv.DictReader(fh):
-            out[row["PROBENNUMMER"]] = (row.get("species", "").strip(), row.get("contamination_flag", "").strip())
+            flag = "contaminated" if row.get("contamination_flag", "").strip() else (
+                "low_cgmlst_coverage" if row.get("excluded", "").strip().lower() == "true" else "")
+            out[row["PROBENNUMMER"]] = (row.get("species", "").strip(), flag)
     return out
 
 
@@ -221,7 +224,7 @@ def sample_qc(sample: str, tag: str, meta: dict[str, tuple[str, str]], samples_d
     why: list[str] = []
     species, contam = meta.get(sample, ("", ""))
     if contam:
-        why.append("contaminated")
+        why.append(contam)
     if species and species not in COMPLEX:
         why.append(f"non_complex({species})")
     hit = load_hit(samples_dir, sample, tag)

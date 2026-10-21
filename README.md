@@ -90,11 +90,11 @@ species, then ID (`sort_samples.py`). The `REF_*` rows get Jalview marker featur
 `marker_calls*.tsv`, which keep `<gene>__<sampleID>`. A gene missing from a draft reference genome is simply absent for that species.
 
 **Sample/gene QC.** A call is only trusted when the sample is a non-contaminated member of the
-*M. kansasii* complex (`species` and `contamination_flag` from `output/screening_map_results.csv`,
+*M. kansasii* complex with enough cgMLST coverage (`species`, `contamination_flag` and `excluded` from `output/screening_map_results.csv`,
 override with `--sample-meta`) and the gene was extracted with >= `--min-ident` (default 80) % BLAST
 identity (a floor against wrong-gene hits; the species check does the real work) and >= `--min-cov` (default 0.9, `gyrA` 0.6 because most samples lack the
 reference's ~1.26 kb insertion; override with `--min-cov-gene GENE=FRAC`) coverage of the reference gene. Otherwise the `qc` column says why
-(`contaminated`, `non_complex(<species>)`, `low_identity(<pct>)`, `partial(<cov>)`, `no_hit`), `differs` is
+(`contaminated`, `low_cgmlst_coverage`, `non_complex(<species>)`, `low_identity(<pct>)`, `partial(<cov>)`, `no_hit`), `differs` is
 `NOCALL` and `aa_call` is empty. `marker_calls.pass.tsv` contains only the rows with `qc == ok`; use it for
 analysis. Without the metadata file only the identity/coverage checks run.
 
@@ -118,7 +118,7 @@ analysis. Without the metadata file only the identity/coverage checks run.
 | `ref_aa_check` | Does the reference carry `wt`, `mut` or `neither` (`neither` = suspect transfer); also set for single-nucleotide markers. `mut` means the reference strain itself carries the mutant allele (e.g. rrs `A514C`), so `MUT` is then the species baseline, not resistance |
 | `aa_call` | `wt` / `MUT` / `OTHER` relative to the marker's own alleles (amino acid, or base for single-nucleotide markers); `OTHER` = changed, but not to the marker's mutant (`differs = YES` alone does not mean the marker mutation); empty if QC failed or for region scans |
 | `discriminating` | `no` when `ref_aa_check = mut` (the ATCC 12478 reference carries the marker's mutant allele, e.g. rpsL `K43R`, rrs `A514C`): `MUT` then only means "same as the reference" and must not be read as predicted resistance. `yes` when the reference carries the wild-type allele; empty when the check is `neither` or unavailable |
-| `species`, `contamination_flag` | Sample metadata from `screening_map_results.csv` |
+| `species`, `contamination_flag` | Sample metadata from `screening_map_results.csv` (`contamination_flag` holds `contaminated` or `low_cgmlst_coverage`, i.e. `excluded` = true) |
 | `hit_pident`, `hit_cov` | BLAST identity (%) and coverage (fraction) of the extracted gene |
 | `qc` | `ok` or the reason the row is masked (see QC above) |
 | `mixed` | Read-mapping mode only: 10-90 % alt-allele sites inside the marker window as `genomic_pos:ref>alt@alt_fraction` (plus-strand genomic coordinates), `;`-separated. The consensus collapses these to the majority base, so a non-empty `mixed` means heteroresistance, a mixed culture or a second gene copy; empty in assembly mode |
