@@ -10,7 +10,7 @@
 set -euo pipefail
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate env_arm
-H=/shares/sander.imm.uzh/MM/kansasii/repos/kansasii-arm
+H=/shares/sander.imm.uzh/MM/kansasii/repos/kansasii-amr-marker-screen
 ROOT=${KANSASII_ROOT:-/shares/sander.imm.uzh/MM/kansasii}
 export ARM_DIR=$ROOT/output/arm_bam
 mapfile -t IDS < <(ls "$ROOT/runs/mkan329/assembly/results")

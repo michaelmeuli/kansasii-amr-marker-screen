@@ -8,7 +8,7 @@
 set -euo pipefail
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate env_arm
-HERE=/shares/sander.imm.uzh/MM/kansasii/repos/kansasii-arm
+HERE=/shares/sander.imm.uzh/MM/kansasii/repos/kansasii-amr-marker-screen
 ROOT=/shares/sander.imm.uzh/MM/kansasii
 ARM_DIR=$ROOT/output/arm python3 "$HERE/05_annotate.py"
 ARM_DIR=$ROOT/output/arm_bam python3 "$HERE/05_annotate.py"
@@ -18,4 +18,4 @@ python3 "$HERE/08_mut_with_mic.py"
 # provenance (see kansasii-docs/docs/PROVENANCE.md)
 bash /shares/sander.imm.uzh/MM/kansasii/repos/kansasii-docs/bin/write_manifest.sh \
   "/shares/sander.imm.uzh/MM/kansasii/output/arm" \
-  /shares/sander.imm.uzh/MM/kansasii/repos/kansasii-arm submit_arm_reannot.sbatch /shares/sander.imm.uzh/MM/kansasii/data/imm/screening_map_results.csv /shares/sander.imm.uzh/MM/kansasii/output/mic
+  /shares/sander.imm.uzh/MM/kansasii/repos/kansasii-amr-marker-screen submit_arm_reannot.sbatch /shares/sander.imm.uzh/MM/kansasii/data/imm/screening_map_results.csv /shares/sander.imm.uzh/MM/kansasii/output/mic
