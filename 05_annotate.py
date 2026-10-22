@@ -35,7 +35,9 @@ non-discriminating (see below).
 
 `discriminating` is "no" when the reference strain carries the marker's mutant allele
 (ref_aa_check == mut; e.g. rpsL K43R, rrs A514C: ATCC 12478 has the "mutant" residue), so an
-aa_call of MUT only means "same as the reference" and is not evidence of resistance; "yes" when the
+aa_call of MUT means "same as the reference", so `differs` is no use. For rpsL K43R MUT is still
+predicted STR resistance (the type strain is a resistant exception; see README); rrs A514C is MUT in
+every sample and is not a usable predictor; "yes" when the
 reference carries the wild-type allele; empty when the reference check is unavailable/suspect.
 
 Usage:
