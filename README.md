@@ -76,7 +76,7 @@ marker × sample with `differs` = YES / SYN / no / NOCALL:
 coding markers are compared at the amino-acid level (YES = residue differs from the
 reference, SYN = synonymous nucleotide change only), other markers at the nucleotide level;
 NOCALL = depth-masked N or alignment gap. Reference strain ATCC 12478 is *not* always the
-wild type (rpsL K43R: the type strain is streptomycin-resistant, see *Predicted resistance vs MIC*), so for substitution markers named like `K43R` read `aa_call` (MUT / wt / OTHER,
+wild type (rpsL K43R: the type strain is a streptomycin-resistant exception, see *Predicted resistance vs MIC*), so for substitution markers named like `K43R` read `aa_call` (MUT / wt / OTHER,
 relative to the marker's own wild-type and mutant residue) and `ref_aa_check` (does the
 reference carry wt, mut, or neither - `neither` means the position transfer is suspect).
 
@@ -117,7 +117,7 @@ analysis. Without the metadata file only the identity/coverage checks run.
 | `marker_wt_aa`, `marker_mut_aa` | Wild-type and mutant residue (or base, for single-nucleotide markers such as rRNA `A2058G`) the marker expects |
 | `ref_aa_check` | Does the reference carry `wt`, `mut` or `neither` (`neither` = suspect transfer); also set for single-nucleotide markers. `mut` means the reference strain itself carries the mutant allele (e.g. rrs `A514C`), so `MUT` is then the species baseline, not resistance |
 | `aa_call` | `wt` / `MUT` / `OTHER` relative to the marker's own alleles (amino acid, or base for single-nucleotide markers); `OTHER` = changed, but not to the marker's mutant (`differs = YES` alone does not mean the marker mutation); empty if QC failed or for region scans |
-| `discriminating` | `no` when `ref_aa_check = mut` (the ATCC 12478 reference carries the marker's mutant allele, e.g. rpsL `K43R`, rrs `A514C`): `MUT` then only means "same as the reference" and must not be read as predicted resistance. `yes` when the reference carries the wild-type allele; empty when the check is `neither` or unavailable |
+| `discriminating` | `no` when `ref_aa_check = mut` (the ATCC 12478 reference carries the marker's mutant allele, e.g. rpsL `K43R`, rrs `A514C`): `MUT` then means "same as the reference", i.e. the polarity is reversed and `differs` is no use. For rpsL `K43R` `MUT` is still predicted streptomycin resistance (see *Predicted resistance vs MIC*); rrs `A514C` is `MUT` in every sample, including K43 wild-types with STR MIC up to 16, so it is not a usable predictor here. `yes` when the reference carries the wild-type allele; empty when the check is `neither` or unavailable |
 | `species`, `contamination_flag` | Sample metadata from `screening_map_results.csv` (`contamination_flag` holds `contaminated` or `low_cgmlst_coverage`, i.e. `excluded` = true) |
 | `hit_pident`, `hit_cov` | BLAST identity (%) and coverage (fraction) of the extracted gene |
 | `qc` | `ok` or the reason the row is masked (see QC above) |
@@ -172,14 +172,24 @@ panel has no streptomycin, so for the streptomycin markers only MHK rows can mat
 streptomycin markers are reference-polarity alleles (the ATCC 12478 reference carries the mutant
 residue/base), so `MUT` means "same as the reference", which is why rrs A514C is `MUT` in every sample.
 
-**rpsL K43R in the type strain is a real resistance allele, not an artefact.** ATCC 12478 (= CCUG 27787^T,
-the *M. kansasii* type strain) carries Arg at rpsL 43 and is documented as streptomycin-resistant
-(<https://www.ccug.se/strain?id=27787&t=27787T>). So `ref_aa_check = mut` / `discriminating = no` for
-K43R means "the reference is itself a K43R resistant strain", and samples called `MUT` share the
-phenotype-linked allele of the type strain; it is the *wild-type* (K43) samples that deviate from the
-reference. The 011, 014, 064, 065, 087 and 128 calls therefore are expected to be STR-resistant, but none of them
-has a streptomycin MIC, so this remains untested in the cohort. Do not read `MUT` here as a novel
-mutation relative to the reference.
+**rpsL K43R is a real resistance allele; the type strain is a resistant exception, not the wild type.**
+ATCC 12478 (= CCUG 27787^T, the *M. kansasii* type strain) carries Arg at rpsL 43 and is documented as
+streptomycin-resistant: the CCUG record lists "Resistant to streptomycin & p-aminosalicylic acid"
+(<https://www.ccug.se/strain?id=27787&t=27787T>; it describes this strain only, not the species).
+Wild-type *M. kansasii* isolates are K43 (Lys, AAG) and the cohort's K43 isolates have STR MIC 0.5-16 mg/L
+(median 4). The K43R nucleotide change (AAG>AGG) is trusted to cause streptomycin resistance, so:
+
+- `aa_call = MUT` for K43R means **predicted STR-resistant**, even though `ref_aa_check = mut` /
+  `discriminating = no` (that only says the reference shares the allele, so `differs` cannot be used).
+- **Mkan329-011, 014, 064, 065, 087 and 128 are K43R `MUT` and are expected to be STR-resistant.** None has a
+  streptomycin MIC (MHK empty, or 087's MHK 2017500059 is not in `mic.csv`; the MGIT panel has no STR), so
+  this is a prediction, not a measurement.
+- **Mkan329-142 and 143 confirm it.** Both are K43R `MUT` (rrs A514C also `MUT`, as in every sample) and
+  have streptomycin MIC `>64` mg/L in `data/imm/screening_map_ast_jc.csv` (NR_JC 47 / 46, TNR 2019500308 /
+  2019500326), a modified z-score of 4.27 against a cohort range of 0.5-16. They are the only K43R samples
+  with an STR MIC. The source value was entered as `<64` and corrected to `>64` on 2026-10-22 (treated as
+  a typo for the top of the tested range; the lab record was not checked), so this confirmation depends on
+  that correction. No CLSI breakpoint exists for STR in NTM, so `STR_clsi_category` stays blank.
 
 ## Coordinate transfer — the thing to understand
 
@@ -266,8 +276,8 @@ only *M. kansasii*-specific observation is rrs A128G in a single isolate with
 streptomycin MIC >64 mg/L, which was never functionally confirmed.
 
 The ATCC 12478 reference (CCUG 27787^T) is itself streptomycin-resistant and carries the rpsL
-K43R allele, which is consistent with K43R being the dominant STR marker in Mtb. Its rpsL K43R / rrs A514C
-state is therefore a resistant baseline, not a wild-type one (see *Predicted resistance vs MIC*).
+K43R allele, which is consistent with K43R being the dominant STR marker in Mtb. Its rpsL K43R
+state is therefore a resistant exception, not a wild-type one (see *Predicted resistance vs MIC*).
 
 ## Windows checkout
 
