@@ -186,9 +186,11 @@ def load_meta(path: str) -> dict[str, tuple[str, str]]:
         return out
     with open(path, encoding="utf-8", newline="") as fh:
         for row in csv.DictReader(fh):
+            species = row.get("species", "").strip()
             flag = "contaminated" if row.get("contamination_flag", "").strip() else (
-                "low_cgmlst_coverage" if row.get("excluded", "").strip().lower() == "true" else "")
-            out[row["PROBENNUMMER"]] = (row.get("species", "").strip(), flag)
+                "low_cgmlst_coverage" if row.get("excluded", "").strip().lower() == "true"
+                and (not species or species in COMPLEX) else "")   # non-complex samples: reported by sample_qc as non_complex
+            out[row["PROBENNUMMER"]] = (species, flag)
     return out
 
 
