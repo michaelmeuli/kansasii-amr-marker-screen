@@ -1,4 +1,4 @@
-name: env_arm
+name: env_amr
 channels:
   - conda-forge
   - bioconda

@@ -50,8 +50,8 @@ def classify(a: Row | None, b: Row | None) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--asm", default=str(ROOT / "output/arm/work/report/marker_calls.tsv"))
-    ap.add_argument("--bam", default=str(ROOT / "output/arm_bam/work/report/marker_calls.tsv"))
-    ap.add_argument("--outdir", default=str(ROOT / "output/arm_bam/work/report"))
+    ap.add_argument("--bam", default=str(ROOT / "output/amr_bam/work/report/marker_calls.tsv"))
+    ap.add_argument("--outdir", default=str(ROOT / "output/amr_bam/work/report"))
     args = ap.parse_args()
 
     asm, bam = load(Path(args.asm)), load(Path(args.bam))

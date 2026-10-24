@@ -30,9 +30,9 @@ Paths: reference downloads and all outputs live outside the repo in
 **All Mkan329 assemblies** (inputs: `runs/mkan329/assembly/results/*/1_unicycler/*.fasta`):
 
 ```bash
-conda env create -f environment.yml     # once: env_arm (samtools bcftools bedtools blast mafft)
+conda env create -f environment.yml     # once: env_amr (samtools bcftools bedtools blast mafft)
 sbatch submit_arm.sbatch                # 01 -> 02 -> 03 per new sample -> 03b -> 04 -> 05
-sbatch submit_arm_reannot.sbatch        # after the MIC analysis: 05 again (arm, arm_bam) -> 07 -> 08
+sbatch submit_arm_reannot.sbatch        # after the MIC analysis: 05 again (arm, amr_bam) -> 07 -> 08
 ```
 
 Call order: `01_fetch_reference.sh`, `02_make_targets.py`, `03_sample_seqs.sh` (once per sample),
@@ -139,7 +139,7 @@ independent of the assembly, so the same 54 markers can also be genotyped from t
 sbatch --array=0-$(( $(ls $KANSASII_ROOT/runs/mkan329/assembly/results | wc -l) - 1 ))%20 submit_arm_bam.sbatch
                                             # array, one task per sample (06_bam_sample.sh); the
                                             # default range 0-185 is the current 186 samples
-sbatch --wrap '...; ./run_arm_bam.sh finish'  # after the array: 04_align + 05_annotate (needs env_arm)
+sbatch --wrap '...; ./run_arm_bam.sh finish'  # after the array: 04_align + 05_annotate (needs env_amr)
 ./07_compare_modes.py                       # asm vs bam
 ```
 
@@ -147,7 +147,7 @@ sbatch --wrap '...; ./run_arm_bam.sh finish'  # after the array: 04_align + 05_a
   to `refs/reference.fna`, then `03_sample_seqs.sh bam` (depth < `MIN_DEPTH` masked to N, minority
   alleles in `mixed_sites.tsv`). The full BAM is discarded; `bam/<ID>.targets.bam` keeps only the
   target regions.
-- Outputs go to `$KANSASII_ROOT/output/arm_bam` (`ARM_DIR`), so `output/arm` is untouched; `refs/`
+- Outputs go to `$KANSASII_ROOT/output/amr_bam` (`ARM_DIR`), so `output/arm` is untouched; `refs/`
   is shared via symlink. `marker_calls.tsv` has the same columns, except that `hit_pident` and
   `hit_cov` are empty (no BLAST step), so only the species/contamination QC applies.
 - The consensus is built per target region. A whole-genome consensus shifts coordinates after

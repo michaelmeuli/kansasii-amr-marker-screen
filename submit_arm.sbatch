@@ -7,7 +7,7 @@
 
 set -euo pipefail
 source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate env_arm
+conda activate env_amr
 /shares/sander.imm.uzh/MM/kansasii/repos/kansasii-amr-marker-screen/run_arm.sh
 
 # provenance (see kansasii-docs/docs/PROVENANCE.md)

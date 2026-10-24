@@ -4,9 +4,9 @@
 # Usage: ./run_arm_bam.sh prepare     # once: shared refs, bwa index, targets
 #        ./run_arm_bam.sh finish      # after all samples: 04_align + 05_annotate
 # Per-sample work is 06_bam_sample.sh (see submit_arm_bam.sbatch for the Slurm array).
-# Output dir: $ARM_DIR (default $KANSASII_ROOT/output/arm_bam); refs/ is shared with output/arm.
+# Output dir: $ARM_DIR (default $KANSASII_ROOT/output/amr_bam); refs/ is shared with output/arm.
 set -euo pipefail
-export ARM_DIR=${ARM_DIR:-${KANSASII_ROOT:-/shares/sander.imm.uzh/MM/kansasii}/output/arm_bam}
+export ARM_DIR=${ARM_DIR:-${KANSASII_ROOT:-/shares/sander.imm.uzh/MM/kansasii}/output/amr_bam}
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 command -v bwa >/dev/null 2>&1 || export PATH=$PATH:${CONDA_ENVS_DIR:-$HOME/data/conda/envs}/snippy/bin   # bwa lives in the snippy env
 

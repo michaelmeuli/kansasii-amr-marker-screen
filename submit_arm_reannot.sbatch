@@ -7,11 +7,11 @@
 
 set -euo pipefail
 source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate env_arm
+conda activate env_amr
 HERE=/shares/sander.imm.uzh/MM/kansasii/repos/kansasii-amr-marker-screen
 ROOT=/shares/sander.imm.uzh/MM/kansasii
 ARM_DIR=$ROOT/output/arm python3 "$HERE/05_annotate.py"
-ARM_DIR=$ROOT/output/arm_bam python3 "$HERE/05_annotate.py"
+ARM_DIR=$ROOT/output/amr_bam python3 "$HERE/05_annotate.py"
 python3 "$HERE/07_compare_modes.py"
 python3 "$HERE/08_mut_with_mic.py"
 

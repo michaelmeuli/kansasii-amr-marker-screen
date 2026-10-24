@@ -16,7 +16,7 @@ REF=$ARM/refs/reference.fna
 mkdir -p "$ARM/bam"
 
 [[ -s "$REF.bwt" ]] || { echo "index missing: run run_arm_bam.sh first" >&2; exit 1; }
-TMP=$(mktemp -d "${TMPDIR:-/tmp}/arm_bam.XXXXXX"); trap 'rm -rf "$TMP"' EXIT
+TMP=$(mktemp -d "${TMPDIR:-/tmp}/amr_bam.XXXXXX"); trap 'rm -rf "$TMP"' EXIT
 
 bwa mem -t "$THREADS" "$REF" "$R/${ID}_r1.fastq.gz" "$R/${ID}_r2.fastq.gz" 2>/dev/null \
   | samtools sort -@ 2 -o "$TMP/$ID.bam" -
