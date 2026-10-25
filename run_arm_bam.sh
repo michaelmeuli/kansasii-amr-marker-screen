@@ -21,6 +21,7 @@ finish)
   "$HERE/03b_species_refs.sh"
   "$HERE/04_align.sh" "${SLURM_CPUS_PER_TASK:-4}"
   python3 "$HERE/05_annotate.py"
+  bash "$ROOT/repos/kansasii-docs/bin/write_manifest.sh" "$ARM" "$HERE" run_arm_bam.sh   # provenance
   ;;
 *) echo "usage: $0 prepare|finish" >&2; exit 1 ;;
 esac
