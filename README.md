@@ -24,34 +24,44 @@ with the grep command to investigate.
 ## Run
 
 Paths: reference downloads and all outputs live outside the repo in
-`$KANSASII_ROOT/output/arm/{refs,work}` (default root
-`/shares/sander.imm.uzh/MM/kansasii`; override the whole dir with `ARM_DIR`).
+`OUTPUT_ROOT/arm/{refs,work}` (`output/arm`; override the whole dir with `ARM_DIR`, the root with `KANSASII_ROOT`).
+
+```
+scripts/          01-08 numbered steps, run_arm.sh, run_arm_bam.sh, env.sh, sort_samples.py, backtranslate.py, kansasii_paths.py (shared constants, vendored)
+config/           markers.tsv (literature markers), targets.tsv (genes), species_refs.tsv (species -> accession)
+submit_arm.sbatch, submit_arm_reannot.sbatch, submit_arm_bam.sbatch
+```
+
+Shell steps source `scripts/env.sh`, which loads the shared `kansasii_paths.sh` (the same names as `kansasii_paths.py` in every repo:
+`ASSEMBLIES`, `GTDB_REPRESENTATIVES`, `SCREENING_MAP_RESULTS`, `OUTPUT_ROOT`, ...). Sample metadata is read from
+`data/imm/screening_map_results.csv` (flag `--sample-meta` of `05`). The genomes of the six other species are
+`GTDB_REPRESENTATIVES/<accession>_query.fasta` (`03b_species_refs.sh -g DIR`); `config/species_refs.tsv` holds only species and accession.
 
 **All Mkan329 assemblies** (inputs: `runs/mkan329/assembly/results/*/1_unicycler/*.fasta`):
 
 ```bash
 conda env create -f environment.yml     # once: env_amr (samtools bcftools bedtools blast mafft)
-sbatch submit_arm.sbatch                # 01 -> 02 -> 03 per new sample -> 03b -> 04 -> 05
+sbatch submit_arm.sbatch                # scripts/01 -> 02 -> 03 per new sample -> 03b -> 04 -> 05
 sbatch submit_arm_reannot.sbatch        # after the MIC analysis: 05 again (arm, amr_bam) -> 07 -> 08
 ```
 
-Call order: `01_fetch_reference.sh`, `02_make_targets.py`, `03_sample_seqs.sh` (once per sample),
+Call order (all in `scripts/`): `01_fetch_reference.sh`, `02_make_targets.py`, `03_sample_seqs.sh` (once per sample),
 `03b_species_refs.sh`, `04_align.sh`, `05_annotate.py`; read-mapping variant `06_bam_sample.sh`
 instead of 03 (see below); then `07_compare_modes.py` and `08_mut_with_mic.py`, which need both
-modes and `output/mic/`. `run_arm.sh` / `run_arm_bam.sh` do the first group.
+modes and `output/mic/`. `scripts/run_arm.sh` / `run_arm_bam.sh` do the first group.
 
 **Step by step** (deps: samtools bcftools bedtools blast mafft python3; macse optional):
 
 ```bash
-./01_fetch_reference.sh                       # assembly + external numbering refs
-python3 02_make_targets.py                    # resolve coordinates from the GFF
+scripts/01_fetch_reference.sh                # assembly + external numbering refs
+python3 scripts/02_make_targets.py             # resolve coordinates from the GFF
 
 # per sample, either mode:
-./03_sample_seqs.sh bam  PT001 mapped/PT001.bam
-./03_sample_seqs.sh asm  PT002 assemblies/PT002.fasta
+scripts/03_sample_seqs.sh bam  PT001 mapped/PT001.bam
+scripts/03_sample_seqs.sh asm  PT002 assemblies/PT002.fasta
 
-./04_align.sh 8
-python3 05_annotate.py
+scripts/04_align.sh 8
+python3 scripts/05_annotate.py
 ```
 
 Type check: `mypy` from the repo root (strict; see `pyproject.toml`).
@@ -82,7 +92,7 @@ reference carry wt, mut, or neither - `neither` means the position transfer is s
 
 **Row names and order.** Rows have one `_` after the gene and are ordered references, control strains, samples:
 `<gene>_REF_kansasii_NC022663` (*M. kansasii* ATCC 12478), then the type/reference strain of persicum,
-pseudokansasii, innocens, attenuatum, ostraviense and gastri (`species_refs.tsv`, extracted by
+pseudokansasii, innocens, attenuatum, ostraviense and gastri (`config/species_refs.tsv`, extracted by
 `03b_species_refs.sh`) named `<gene>_REF_<species>_<GCF accession>` (e.g. `rpsL_REF_persicum_GCF002086675`; drafts have no NC id),
 then the control strains Mkan329-126..133 (non-empty `LABEL`) as `<gene>_<sampleID>_<abbreviated label>` (e.g.
 `rpsL_Mkan329-126_tuberculosis_ATCC27294`), then the samples as `<gene>_<sampleID>_<species>` sorted by
@@ -90,7 +100,7 @@ species, then ID (`sort_samples.py`). The `REF_*` rows get Jalview marker featur
 `marker_calls*.tsv`, which keep `<gene>__<sampleID>`. A gene missing from a draft reference genome is simply absent for that species.
 
 **Sample/gene QC.** A call is only trusted when the sample is a non-contaminated member of the
-*M. kansasii* complex with enough cgMLST coverage (`species`, `contamination_flag` and `excluded` from `output/screening_map_results.csv`,
+*M. kansasii* complex with enough cgMLST coverage (`species`, `contamination_flag` and `excluded` from `data/imm/screening_map_results.csv`,
 override with `--sample-meta`) and the gene was extracted with >= `--min-ident` (default 80) % BLAST
 identity (a floor against wrong-gene hits; the species check does the real work) and >= `--min-cov` (default 0.9, `gyrA` 0.6 because most samples lack the
 reference's ~1.26 kb insertion; override with `--min-cov-gene GENE=FRAC`) coverage of the reference gene. Otherwise the `qc` column says why
@@ -135,12 +145,12 @@ species can give a misassembled or non-orthologous gene copy, which shows up as 
 independent of the assembly, so the same 54 markers can also be genotyped from the trimmed reads:
 
 ```bash
-./run_arm_bam.sh prepare                    # once: shared refs/ symlink, targets, bwa index
-sbatch --array=0-$(( $(ls $KANSASII_ROOT/runs/mkan329/assembly/results | wc -l) - 1 ))%20 submit_arm_bam.sbatch
+scripts/run_arm_bam.sh prepare             # once: shared refs/ symlink, targets, bwa index
+sbatch --array=0-$(( $(ls $KANSASII_ROOT/runs/mkan329/assembly/results | wc -l) - 1 ))%20 submit_arm_bam.sbatch   # ASSEMBLIES
                                             # array, one task per sample (06_bam_sample.sh); the
                                             # default range 0-185 is the current 186 samples
-sbatch --wrap '...; ./run_arm_bam.sh finish'  # after the array: 04_align + 05_annotate (needs env_amr)
-./07_compare_modes.py                       # asm vs bam
+sbatch --wrap '...; scripts/run_arm_bam.sh finish'  # after the array: 04_align + 05_annotate (needs env_amr)
+python3 scripts/07_compare_modes.py           # asm vs bam
 ```
 
 - `06_bam_sample.sh ID`: `bwa mem` of `runs/mkan329/assembly/results/<ID>/0_trimming/<ID>_r{1,2}.fastq.gz`
@@ -193,7 +203,7 @@ Wild-type *M. kansasii* isolates are K43 (Lys, AAG) and the cohort's K43 isolate
 
 ## Coordinate transfer — the thing to understand
 
-Almost nothing in `markers.tsv` is in *M. kansasii* coordinates:
+Almost nothing in `config/markers.tsv` is in *M. kansasii* coordinates:
 
 - rrl / rrs positions (2058, 2059, 1408, 903–906, 514) are **E. coli numbering**
 - rpoB, rpsL, gid, rplC, rplD, gyrB codons are **M. tuberculosis numbering**
@@ -221,7 +231,7 @@ time you run this. The consensus numbering paper for mycobacterial rpoB is
 
 ### Evidence levels
 
-The `evidence` column in `markers.tsv` is shown in the Jalview feature description. `evidence_species` says where the evidence was observed and `doi`
+The `evidence` column in `config/markers.tsv` is shown in the Jalview feature description. `evidence_species` says where the evidence was observed and `doi`
 gives the paper.
 
 | Level | Meaning |
