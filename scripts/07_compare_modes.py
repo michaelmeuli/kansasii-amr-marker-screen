@@ -16,11 +16,13 @@ from __future__ import annotations
 
 import argparse
 import csv
-import os
+import sys
 from collections import Counter
 from pathlib import Path
 
-ROOT = Path(os.environ.get("KANSASII_ROOT", "/shares/sander.imm.uzh/MM/kansasii"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # kansasii_paths.py sits next to this script
+from kansasii_paths import OUTPUT_ROOT  # noqa: E402
+
 CALLED = {"YES", "SYN", "no"}
 Row = dict[str, str]
 
@@ -49,9 +51,9 @@ def classify(a: Row | None, b: Row | None) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--asm", default=str(ROOT / "output/arm/work/report/marker_calls.tsv"))
-    ap.add_argument("--bam", default=str(ROOT / "output/amr_bam/work/report/marker_calls.tsv"))
-    ap.add_argument("--outdir", default=str(ROOT / "output/amr_bam/work/report"))
+    ap.add_argument("--asm", default=str(OUTPUT_ROOT / "arm/work/report/marker_calls.tsv"))
+    ap.add_argument("--bam", default=str(OUTPUT_ROOT / "amr_bam/work/report/marker_calls.tsv"))
+    ap.add_argument("--outdir", default=str(OUTPUT_ROOT / "amr_bam/work/report"))
     args = ap.parse_args()
 
     asm, bam = load(Path(args.asm)), load(Path(args.bam))

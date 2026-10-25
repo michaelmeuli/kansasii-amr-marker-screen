@@ -3,7 +3,7 @@
 # extract the target genes (03_sample_seqs.sh bam), keep only a target-region BAM.
 #
 # Usage: ARM_DIR=<bam-mode dir> ./06_bam_sample.sh SAMPLE_ID [THREADS]
-# Inputs : $ROOT/runs/mkan329/assembly/results/<id>/0_trimming/<id>_r{1,2}.fastq.gz
+# Inputs : ASSEMBLIES/<id>/0_trimming/<id>_r{1,2}.fastq.gz
 # Outputs: $ARM/work/samples/<id>/ (as 03), $ARM/bam/<id>.targets.bam (+ .bai)
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
@@ -11,7 +11,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 ID=${1:?sample id}
 THREADS=${2:-${SLURM_CPUS_PER_TASK:-4}}
 command -v bwa >/dev/null 2>&1 || export PATH=$PATH:${CONDA_ENVS_DIR:-$HOME/data/conda/envs}/snippy/bin   # bwa lives in the snippy env
-R=$ROOT/runs/mkan329/assembly/results/$ID/0_trimming
+R=$ASSEMBLIES/$ID/0_trimming
 REF=$ARM/refs/reference.fna
 mkdir -p "$ARM/bam"
 

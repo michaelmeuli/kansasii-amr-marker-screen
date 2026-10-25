@@ -41,7 +41,7 @@ every sample and is not a usable predictor; "yes" when the
 reference carries the wild-type allele; empty when the reference check is unavailable/suspect.
 
 Usage:
-  python3 05_annotate.py            # defaults: $KANSASII_ROOT/output/arm/{refs,work}
+  python3 05_annotate.py            # defaults: OUTPUT_ROOT/arm/{refs,work} (ARM_DIR overrides), ../config/markers.tsv
   python3 05_annotate.py --aln-dir DIR --refs DIR --markers markers.tsv \
       --resolved targets.resolved.tsv --outdir DIR
 """
@@ -58,12 +58,14 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(os.environ.get("KANSASII_ROOT", "/shares/sander.imm.uzh/MM/kansasii"))
-ARM = Path(os.environ.get("ARM_DIR", ROOT / "output" / "arm"))
-HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # kansasii_paths.py sits next to this script
+from kansasii_paths import OUTPUT_ROOT, SCREENING_MAP_RESULTS, SPECIES  # noqa: E402
+
+ARM = Path(os.environ.get("ARM_DIR", OUTPUT_ROOT / "arm"))
+CONFIG = Path(__file__).resolve().parent.parent / "config"
 
 SPECIES_REF_PREFIX = "REF_"  # other complex-species references (<gene>_REF_<species>_<GCF>); never called
-COMPLEX = {"kansasii", "persicum", "pseudokansasii", "innocens", "attenuatum", "ostraviense", "gastri"}
+COMPLEX_SPECIES = set(SPECIES)  # includes gastri
 
 CODONS: dict[str, str] = {}
 _B, _AA = "TCAG", "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"
@@ -189,7 +191,7 @@ def load_meta(path: str) -> dict[str, tuple[str, str]]:
             species = row.get("species", "").strip()
             flag = "contaminated" if row.get("contamination_flag", "").strip() else (
                 "low_cgmlst_coverage" if row.get("excluded", "").strip().lower() == "true"
-                and (not species or species in COMPLEX) else "")   # non-complex samples: reported by sample_qc as non_complex
+                and (not species or species in COMPLEX_SPECIES) else "")   # non-complex samples: reported by sample_qc as non_complex
             out[row["PROBENNUMMER"]] = (species, flag)
     return out
 
@@ -229,7 +231,7 @@ def sample_qc(sample: str, tag: str, meta: dict[str, tuple[str, str]], samples_d
     species, contam = meta.get(sample, ("", ""))
     if contam:
         why.append(contam)
-    if species and species not in COMPLEX:
+    if species and species not in COMPLEX_SPECIES:
         why.append(f"non_complex({species})")
     hit = load_hit(samples_dir, sample, tag)
     if hit is None:
@@ -248,11 +250,11 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--aln-dir", default=str(ARM / "work" / "aln"))
     ap.add_argument("--refs", default=str(ARM / "refs"))
-    ap.add_argument("--markers", default=str(HERE / "markers.tsv"))
+    ap.add_argument("--markers", default=str(CONFIG / "markers.tsv"))
     ap.add_argument("--resolved", default=str(ARM / "work" / "targets.resolved.tsv"))
     ap.add_argument("--outdir", default=str(ARM / "work" / "report"))
     ap.add_argument("--samples", default=str(ARM / "work" / "samples"))
-    ap.add_argument("--sample-meta", default=str(ROOT / "output" / "screening_map_results.csv"))
+    ap.add_argument("--sample-meta", default=str(SCREENING_MAP_RESULTS))
     ap.add_argument("--min-ident", type=float, default=80.0,
                     help="minimum BLAST %% identity of the extracted gene to the reference gene "
                          "(a floor against wrong-gene hits; species gating does the real work, and "

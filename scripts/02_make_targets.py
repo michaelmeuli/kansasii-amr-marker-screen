@@ -14,7 +14,7 @@ Outputs (into --outdir):
   ref_genes/<gene>.fa   reference gene sequence, already strand-corrected
 
 Usage:
-  python3 02_make_targets.py        # defaults: $KANSASII_ROOT/output/arm/{refs,work}
+  python3 02_make_targets.py        # defaults: OUTPUT_ROOT/arm/{refs,work} (ARM_DIR overrides), ../config/targets.tsv
   python3 02_make_targets.py --gff G.gff --fasta G.fna --targets targets.tsv --outdir DIR
 """
 from __future__ import annotations
@@ -29,9 +29,11 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
-ROOT = Path(os.environ.get("KANSASII_ROOT", "/shares/sander.imm.uzh/MM/kansasii"))
-ARM = Path(os.environ.get("ARM_DIR", ROOT / "output" / "arm"))
-HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # kansasii_paths.py sits next to this script
+from kansasii_paths import OUTPUT_ROOT  # noqa: E402
+
+ARM = Path(os.environ.get("ARM_DIR", OUTPUT_ROOT / "arm"))
+CONFIG = Path(__file__).resolve().parent.parent / "config"
 
 COMP = str.maketrans("ACGTacgtNnRYKMSWByrkmswbVvDdHh", "TGCAtgcaNnYRMKSWVrymkswvBbHhDd")
 
@@ -91,7 +93,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--gff", default=str(ARM / "refs" / "reference.gff"))
     ap.add_argument("--fasta", default=str(ARM / "refs" / "reference.fna"))
-    ap.add_argument("--targets", default=str(HERE / "targets.tsv"))
+    ap.add_argument("--targets", default=str(CONFIG / "targets.tsv"))
     ap.add_argument("--outdir", default=str(ARM / "work"))
     args = ap.parse_args()
 

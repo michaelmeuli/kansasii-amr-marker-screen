@@ -1,8 +1,0 @@
-# species	accession	fasta (relative to $KANSASII_ROOT)
-# kansasii = the REF_<gene> record itself (ATCC 12478, GCF_000157895.3); listed here in alignment order
-persicum	GCF_002086675.1	data/gtdb_genomes/Mycobacteriaceae/kansasii_complex_gtdb_representatives/GCF_002086675.1_query.fasta
-pseudokansasii	GCF_900566075.1	data/gtdb_genomes/Mycobacteriaceae/kansasii_complex_gtdb_representatives/GCF_900566075.1_query.fasta
-innocens	GCF_900566055.1	data/gtdb_genomes/Mycobacteriaceae/kansasii_complex_gtdb_representatives/GCF_900566055.1_query.fasta
-attenuatum	GCF_900566085.1	data/gtdb_genomes/Mycobacteriaceae/kansasii_complex_gtdb_representatives/GCF_900566085.1_query.fasta
-ostraviense	GCF_002705925.1	data/gtdb_genomes/Mycobacteriaceae/kansasii_complex_gtdb_representatives/GCF_002705925.1_query.fasta
-gastri	GCF_002102175.1	data/gtdb_genomes/Mycobacteriaceae/kansasii_complex_gtdb_representatives/GCF_002102175.1_query.fasta

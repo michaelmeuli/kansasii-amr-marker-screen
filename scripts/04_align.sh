@@ -16,7 +16,7 @@ ALN=$ARM/work/aln
 mkdir -p "$ALN"
 
 # Which genes are protein-coding, taken from targets.tsv feature type
-mapfile -t CODING < <(awk -F'\t' '!/^#/ && $5 ~ /CDS/ {print $1}' "$HERE/targets.tsv")
+mapfile -t CODING < <(awk -F'\t' '!/^#/ && $5 ~ /CDS/ {print $1}' "$CONFIG/targets.tsv")
 is_coding () { for g in "${CODING[@]}"; do [[ "${1%%_c[0-9]*}" == "$g" ]] && return 0; done; return 1; }
 
 for refgene in "$ARM"/work/ref_genes/*.fa; do
@@ -31,10 +31,10 @@ for refgene in "$ARM"/work/ref_genes/*.fa; do
     r="$ARM/work/species_refs/REFSP_$sp/genes/$tag.fa"
     acc_id=${acc%.*}; acc_id=${acc_id//_/}   # GCF_002086675.1 -> GCF002086675
     [[ -e "$r" ]] && sed "1s/.*/>${tag}_REF_${sp}_${acc_id}/" "$r" >> "$in"
-  done < "$HERE/species_refs.tsv"
+  done < "$CONFIG/species_refs.tsv"
   # control strains (LABEL set, e.g. Mkan329-126..133) first, then samples by species then id;
   # rows named <gene>_<id>_<species|abbreviated label>
-  python3 "$HERE/sort_samples.py" "$ROOT/output/screening_map_results.csv" "$ARM/work/samples" "$tag" >> "$in"
+  python3 "$HERE/sort_samples.py" "$SCREENING_MAP_RESULTS" "$ARM/work/samples" "$tag" >> "$in"
   found=$(grep "^>" "$in" | grep -vc "^>${tag}_REF_" || true)
   if (( found == 0 )); then
     echo "[skip] $tag: reference only, no sample sequences"; continue

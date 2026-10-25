@@ -1,0 +1,8 @@
+# species	accession   (genome: $GTDB_REPRESENTATIVES/<accession>_query.fasta, flag -g of 03b_species_refs.sh)
+# kansasii = the REF_<gene> record itself (ATCC 12478, GCF_000157895.3); listed here in alignment order
+persicum	GCF_002086675.1
+pseudokansasii	GCF_900566075.1
+innocens	GCF_900566055.1
+attenuatum	GCF_900566085.1
+ostraviense	GCF_002705925.1
+gastri	GCF_002102175.1
