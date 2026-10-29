@@ -232,7 +232,9 @@ time you run this. The consensus numbering paper for mycobacterial rpoB is
 ### Evidence levels
 
 The `evidence` column in `config/markers.tsv` is shown in the Jalview feature description. `evidence_species` says where the evidence was observed and `doi`
-gives the paper.
+gives the paper. `citekey` is the BibTeX key in `kansasii-docs/docs/references.bib` (full citations in
+`docs/REFERENCES.md`); a `proposed:` prefix means a candidate source found by search, abstract read only, not yet
+checked against the full text; `NA` means no source found.
 
 | Level | Meaning |
 |---|---|
