@@ -1,0 +1,10 @@
+#file	db	accession	range	organism	numbers
+ECOLI_16S_NT.fa	nuccore	J01695.2	1268-2809	Escherichia coli K-12 rrnB (16S rRNA)	rrs
+ECOLI_23S_NT.fa	nuccore	V00331.1	-	Escherichia coli rrnB (23S rRNA)	rrl
+MTB_RPOB_PROT.fa	protein	NP_215181.1	-	Mycobacterium tuberculosis H37Rv Rv0667	rpoB
+MTB_GYRB_PROT.fa	protein	NP_214519.2	-	Mycobacterium tuberculosis H37Rv Rv0005	gyrB
+MTB_RPSL_PROT.fa	protein	NP_215196.1	-	Mycobacterium tuberculosis H37Rv Rv0682	rpsL
+MTB_GIDB_PROT.fa	protein	NP_218436.1	-	Mycobacterium tuberculosis H37Rv Rv3919c	gid
+MTB_RPLC_PROT.fa	protein	NP_215215.1	-	Mycobacterium tuberculosis H37Rv Rv0701	rplC
+MTB_RPLD_PROT.fa	protein	NP_215216.1	-	Mycobacterium tuberculosis H37Rv Rv0702	rplD
+MAV_GYRA_PROT.fa	protein	WP_011723278.1	-	Mycobacterium avium complex (MULTISPECIES)	gyrA
