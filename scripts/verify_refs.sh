@@ -47,6 +47,6 @@ with open(out, 'w') as o:
 print(f'targets: {bad} of the resolved rows do not match the GFF' if bad else 'targets: all resolved rows match the GFF')
 sys.exit(1 if bad else 0)
 PY
-"${KANSASII_ROOT:-/shares/sander.imm.uzh/MM/kansasii}/repos/kansasii-docs/bin/write_manifest.sh" "$OUT" "$(dirname "$HERE")" scripts/verify_refs.sh \
+"$MANIFEST_SCRIPT" "$OUT" "$(dirname "$HERE")" scripts/verify_refs.sh \
   "$CONFIG/seq_refs.tsv" "$AMR/refs" "$AMR/work/targets.resolved.tsv"
 [[ $fail -eq 0 ]] && echo "ALL PASS" || { echo "SOME CHECKS FAILED (see $OUT)"; exit 1; }
