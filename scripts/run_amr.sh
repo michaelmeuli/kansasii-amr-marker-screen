@@ -4,7 +4,7 @@
 # Usage: ./run_amr.sh [THREADS]
 #
 # Inputs : ASSEMBLIES/<id>/1_unicycler/<id>.fasta (kansasii_paths.sh)
-# Outputs: $AMR_DIR (default OUTPUT_ROOT/amr)/{refs,work}
+# Outputs: $AMR_DIR (default OUT_AMR/results/assembly)/{refs,work}
 # Env    : MIN_DEPTH / MIN_IDENT as in 03_sample_seqs.sh; ASM_GLOB overrides the input glob.
 # Samples already present in work/samples/ are skipped (delete the dir to redo one);
 # 04/05 always re-run on everything present.

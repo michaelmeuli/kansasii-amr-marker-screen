@@ -24,7 +24,7 @@ with the grep command to investigate.
 ## Run
 
 Paths: reference downloads and all outputs live outside the repo in
-`OUTPUT_ROOT/amr/{refs,work}` (`output/amr`; override the whole dir with `AMR_DIR`, the root with `KANSASII_ROOT`).
+`OUT_AMR/results/assembly/{refs,work}` (`output/kansasii-amr-marker-screen/results/assembly`; override the whole dir with `AMR_DIR`, the root with `KANSASII_ROOT`).
 
 ```
 scripts/          01-08 numbered steps, run_amr.sh, run_amr_bam.sh, env.sh, sort_samples.py, backtranslate.py, kansasii_paths.py (shared constants, vendored)
@@ -48,7 +48,7 @@ sbatch submit_amr_reannot.sbatch        # after the MIC analysis: 05 again (amr,
 Call order (all in `scripts/`): `01_fetch_reference.sh`, `02_make_targets.py`, `03_sample_seqs.sh` (once per sample),
 `03b_species_refs.sh`, `04_align.sh`, `05_annotate.py`; read-mapping variant `06_bam_sample.sh`
 instead of 03 (see below); then `07_compare_modes.py` and `08_mut_with_mic.py`, which need both
-modes and `output/mic/`. `scripts/run_amr.sh` / `run_amr_bam.sh` do the first group.
+modes and `output/kansasii-mic/results/`. `scripts/run_amr.sh` / `run_amr_bam.sh` do the first group.
 
 **Step by step** (deps: samtools bcftools bedtools blast mafft python3; macse optional):
 
@@ -157,7 +157,7 @@ python3 scripts/07_compare_modes.py           # asm vs bam
   to `refs/reference.fna`, then `03_sample_seqs.sh bam` (depth < `MIN_DEPTH` masked to N, minority
   alleles in `mixed_sites.tsv`). The full BAM is discarded; `bam/<ID>.targets.bam` keeps only the
   target regions.
-- Outputs go to `$KANSASII_ROOT/output/amr_bam` (`AMR_DIR`), so `output/amr` is untouched; `refs/`
+- Outputs go to `$KANSASII_ROOT/output/kansasii-amr-marker-screen/results/bam` (`AMR_DIR`), so `output/kansasii-amr-marker-screen/results/assembly` is untouched; `refs/`
   is shared via symlink. `marker_calls.tsv` has the same columns, except that `hit_pident` and
   `hit_cov` are empty (no BLAST step), so only the species/contamination QC applies.
 - The consensus is built per target region. A whole-genome consensus shifts coordinates after
@@ -174,8 +174,8 @@ python3 scripts/07_compare_modes.py           # asm vs bam
 ## Predicted resistance vs MIC
 
 `08_mut_with_mic.py` keeps the `aa_call = MUT` (qc ok) rows of `marker_calls.pass.tsv` and joins
-them by sample id to the parsed MHK (`output/mic/mhk/mic_parsed.csv`) and MGIT
-(`output/mic/mgit/mgit_parsed.csv`) tables. Output `mut_with_mic.tsv` (next to `marker_calls.tsv`)
+them by sample id to the parsed MHK (`output/kansasii-mic/results/mhk/mic_parsed.csv`) and MGIT
+(`output/kansasii-mic/results/mgit/mgit_parsed.csv`) tables. Output `mut_with_mic.tsv` (next to `marker_calls.tsv`)
 has one row per marker call x MIC row; `mic_matches_drug = 1` marks the MIC of the drug the
 marker predicts. Samples without any MIC are dropped (listed in the printed summary). The MGIT
 panel has no streptomycin, so for the streptomycin markers only MHK rows can match. Both

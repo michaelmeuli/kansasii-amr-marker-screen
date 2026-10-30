@@ -21,7 +21,7 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # kansasii_paths.py sits next to this script
-from kansasii_paths import OUTPUT_ROOT  # noqa: E402
+from kansasii_paths import OUT_AMR
 
 CALLED = {"YES", "SYN", "no"}
 Row = dict[str, str]
@@ -51,9 +51,9 @@ def classify(a: Row | None, b: Row | None) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--asm", default=str(OUTPUT_ROOT / "amr/work/report/marker_calls.tsv"))
-    ap.add_argument("--bam", default=str(OUTPUT_ROOT / "amr_bam/work/report/marker_calls.tsv"))
-    ap.add_argument("--outdir", default=str(OUTPUT_ROOT / "amr_bam/work/report"))
+    ap.add_argument("--asm", default=str(OUT_AMR / "results/assembly/work/report/marker_calls.tsv"))
+    ap.add_argument("--bam", default=str(OUT_AMR / "results/bam/work/report/marker_calls.tsv"))
+    ap.add_argument("--outdir", default=str(OUT_AMR / "results/bam/work/report"))
     args = ap.parse_args()
 
     asm, bam = load(Path(args.asm)), load(Path(args.bam))

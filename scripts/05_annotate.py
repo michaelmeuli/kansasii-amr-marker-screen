@@ -41,7 +41,7 @@ every sample and is not a usable predictor; "yes" when the
 reference carries the wild-type allele; empty when the reference check is unavailable/suspect.
 
 Usage:
-  python3 05_annotate.py            # defaults: OUTPUT_ROOT/amr/{refs,work} (AMR_DIR overrides), ../config/markers.tsv
+  python3 05_annotate.py            # defaults: OUT_AMR/results/assembly/{refs,work} (AMR_DIR overrides), ../config/markers.tsv
   python3 05_annotate.py --aln-dir DIR --refs DIR --markers markers.tsv \
       --resolved targets.resolved.tsv --outdir DIR
 """
@@ -59,9 +59,9 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # kansasii_paths.py sits next to this script
-from kansasii_paths import OUTPUT_ROOT, SCREENING_MAP_RESULTS, SPECIES  # noqa: E402
+from kansasii_paths import OUT_AMR, SCREENING_MAP_RESULTS, SPECIES
 
-AMR = Path(os.environ.get("AMR_DIR", OUTPUT_ROOT / "amr"))
+AMR = Path(os.environ.get("AMR_DIR", OUT_AMR / "results" / "assembly"))
 CONFIG = Path(__file__).resolve().parent.parent / "config"
 
 SPECIES_REF_PREFIX = "REF_"  # other complex-species references (<gene>_REF_<species>_<GCF>); never called

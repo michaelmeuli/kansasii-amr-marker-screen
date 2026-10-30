@@ -3,8 +3,8 @@
 
 Takes marker_calls.pass.tsv, keeps rows with aa_call == MUT (qc ok), and joins them on the sample id
 (PROBENNUMMER) to the parsed phenotype tables:
-  MHK   output/mic/mhk/mic_parsed.csv     Sensititre MIC (mg/L)
-  MGIT  output/mic/mgit/mgit_parsed.csv   MGIT S/R per concentration (mg/L)
+  MHK   output/kansasii-mic/results/mhk/mic_parsed.csv     Sensititre MIC (mg/L)
+  MGIT  output/kansasii-mic/results/mgit/mgit_parsed.csv   MGIT S/R per concentration (mg/L)
 Writes mut_with_mic.tsv, one row per (marker call x MIC row). Samples with no MIC in either
 source are dropped (listed in the summary). mic_matches_drug = 1 where the MIC antibiotic is the
 drug the marker predicts (e.g. streptomycin); the MGIT panel has no streptomycin.
@@ -18,7 +18,7 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # kansasii_paths.py sits next to this script
-from kansasii_paths import OUTPUT_ROOT  # noqa: E402
+from kansasii_paths import OUT_AMR, OUT_MIC
 
 Row = dict[str, str]
 
@@ -37,10 +37,10 @@ def sample_id(r: Row) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--calls", default=str(OUTPUT_ROOT / "amr/work/report/marker_calls.pass.tsv"))
-    ap.add_argument("--mhk", default=str(OUTPUT_ROOT / "mic/mhk/mic_parsed.csv"))
-    ap.add_argument("--mgit", default=str(OUTPUT_ROOT / "mic/mgit/mgit_parsed.csv"))
-    ap.add_argument("--out", default=str(OUTPUT_ROOT / "amr/work/report/mut_with_mic.tsv"))
+    ap.add_argument("--calls", default=str(OUT_AMR / "results/assembly/work/report/marker_calls.pass.tsv"))
+    ap.add_argument("--mhk", default=str(OUT_MIC / "results/mhk/mic_parsed.csv"))
+    ap.add_argument("--mgit", default=str(OUT_MIC / "results/mgit/mgit_parsed.csv"))
+    ap.add_argument("--out", default=str(OUT_AMR / "results/assembly/work/report/mut_with_mic.tsv"))
     args = ap.parse_args()
 
     mut = [r for r in read(Path(args.calls), "\t") if r["aa_call"] == "MUT" and r["qc"] == "ok"]

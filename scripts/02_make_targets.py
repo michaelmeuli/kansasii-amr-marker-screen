@@ -14,7 +14,7 @@ Outputs (into --outdir):
   ref_genes/<gene>.fa   reference gene sequence, already strand-corrected
 
 Usage:
-  python3 02_make_targets.py        # defaults: OUTPUT_ROOT/amr/{refs,work} (AMR_DIR overrides), ../config/targets.tsv
+  python3 02_make_targets.py        # defaults: OUT_AMR/results/assembly/{refs,work} (AMR_DIR overrides), ../config/targets.tsv
   python3 02_make_targets.py --gff G.gff --fasta G.fna --targets targets.tsv --outdir DIR
 """
 from __future__ import annotations
@@ -30,9 +30,9 @@ from typing import Any
 from urllib.parse import unquote
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # kansasii_paths.py sits next to this script
-from kansasii_paths import OUTPUT_ROOT  # noqa: E402
+from kansasii_paths import OUT_AMR
 
-AMR = Path(os.environ.get("AMR_DIR", OUTPUT_ROOT / "amr"))
+AMR = Path(os.environ.get("AMR_DIR", OUT_AMR / "results" / "assembly"))
 CONFIG = Path(__file__).resolve().parent.parent / "config"
 
 COMP = str.maketrans("ACGTacgtNnRYKMSWByrkmswbVvDdHh", "TGCAtgcaNnYRMKSWVrymkswvBbHhDd")

@@ -4,17 +4,17 @@
 # Usage: ./run_amr_bam.sh prepare     # once: shared refs, bwa index, targets
 #        ./run_amr_bam.sh finish      # after all samples: 04_align + 05_annotate
 # Per-sample work is 06_bam_sample.sh (see submit_amr_bam.sbatch for the Slurm array).
-# Output dir: $AMR_DIR (default OUTPUT_ROOT/amr_bam); refs/ is shared with output/amr.
+# Output dir: $AMR_DIR (default OUT_AMR/results/bam); refs/ is shared with output/kansasii-amr-marker-screen/results/assembly.
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
-export AMR_DIR=${AMR_DIR:-$OUTPUT_ROOT/amr_bam}
+export AMR_DIR=${AMR_DIR:-$OUT_AMR/results/bam}
 AMR=$AMR_DIR
 command -v bwa >/dev/null 2>&1 || export PATH=$PATH:${CONDA_ENVS_DIR:-$HOME/data/conda/envs}/snippy/bin   # bwa lives in the snippy env
 
 case "${1:?prepare|finish}" in
 prepare)
   mkdir -p "$AMR"
-  [[ -e "$AMR/refs" ]] || ln -s "$OUTPUT_ROOT/amr/refs" "$AMR/refs"
+  [[ -e "$AMR/refs" ]] || ln -s "$OUT_AMR/results/assembly/refs" "$AMR/refs"
   python3 "$HERE/02_make_targets.py"
   [[ -s "$AMR/refs/reference.fna.bwt" ]] || bwa index "$AMR/refs/reference.fna"
   ;;
