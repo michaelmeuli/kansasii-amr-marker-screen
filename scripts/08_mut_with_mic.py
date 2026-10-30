@@ -37,10 +37,10 @@ def sample_id(r: Row) -> str:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--calls", default=str(OUTPUT_ROOT / "arm/work/report/marker_calls.pass.tsv"))
+    ap.add_argument("--calls", default=str(OUTPUT_ROOT / "amr/work/report/marker_calls.pass.tsv"))
     ap.add_argument("--mhk", default=str(OUTPUT_ROOT / "mic/mhk/mic_parsed.csv"))
     ap.add_argument("--mgit", default=str(OUTPUT_ROOT / "mic/mgit/mgit_parsed.csv"))
-    ap.add_argument("--out", default=str(OUTPUT_ROOT / "arm/work/report/mut_with_mic.tsv"))
+    ap.add_argument("--out", default=str(OUTPUT_ROOT / "amr/work/report/mut_with_mic.tsv"))
     args = ap.parse_args()
 
     mut = [r for r in read(Path(args.calls), "\t") if r["aa_call"] == "MUT" and r["qc"] == "ok"]

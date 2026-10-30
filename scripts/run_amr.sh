@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# run_arm.sh - run the full AMR-target pipeline on the Mkan329 assemblies.
+# run_amr.sh - run the full AMR-target pipeline on the Mkan329 assemblies.
 #
-# Usage: ./run_arm.sh [THREADS]
+# Usage: ./run_amr.sh [THREADS]
 #
 # Inputs : ASSEMBLIES/<id>/1_unicycler/<id>.fasta (kansasii_paths.sh)
-# Outputs: $ARM_DIR (default OUTPUT_ROOT/arm)/{refs,work}
+# Outputs: $AMR_DIR (default OUTPUT_ROOT/amr)/{refs,work}
 # Env    : MIN_DEPTH / MIN_IDENT as in 03_sample_seqs.sh; ASM_GLOB overrides the input glob.
 # Samples already present in work/samples/ are skipped (delete the dir to redo one);
 # 04/05 always re-run on everything present.
@@ -14,14 +14,14 @@ source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 THREADS=${1:-${SLURM_CPUS_PER_TASK:-4}}
 ASM_GLOB=${ASM_GLOB:-$ASSEMBLIES/*/1_unicycler/*.fasta}
 
-[[ -s "$ARM/refs/reference.gff" ]] || "$HERE/01_fetch_reference.sh"
+[[ -s "$AMR/refs/reference.gff" ]] || "$HERE/01_fetch_reference.sh"
 python3 "$HERE/02_make_targets.py"
 
 n=0
 for fa in $ASM_GLOB; do
   [[ -e "$fa" ]] || { echo "no assemblies match: $ASM_GLOB" >&2; exit 1; }
   id=$(basename "$fa" .fasta)
-  if [[ -d "$ARM/work/samples/$id/genes" ]]; then echo "[skip] $id"; continue; fi
+  if [[ -d "$AMR/work/samples/$id/genes" ]]; then echo "[skip] $id"; continue; fi
   "$HERE/03_sample_seqs.sh" asm "$id" "$fa"
   n=$((n+1))
 done

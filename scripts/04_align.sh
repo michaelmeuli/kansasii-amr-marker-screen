@@ -12,14 +12,14 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 
 THREADS=${1:-4}
-ALN=$ARM/work/aln
+ALN=$AMR/work/aln
 mkdir -p "$ALN"
 
 # Which genes are protein-coding, taken from targets.tsv feature type
 mapfile -t CODING < <(awk -F'\t' '!/^#/ && $5 ~ /CDS/ {print $1}' "$CONFIG/targets.tsv")
 is_coding () { for g in "${CODING[@]}"; do [[ "${1%%_c[0-9]*}" == "$g" ]] && return 0; done; return 1; }
 
-for refgene in "$ARM"/work/ref_genes/*.fa; do
+for refgene in "$AMR"/work/ref_genes/*.fa; do
   tag=$(basename "$refgene" .fa)
   in="$ALN/$tag.input.fa"
   # kansasii REF: >REF_<tag>|locus|NC_022663.1:s-e(+)  ->  ><tag>_REF_kansasii_NC022663
@@ -28,13 +28,13 @@ for refgene in "$ARM"/work/ref_genes/*.fa; do
   # ><tag>_REF_<species>_<GCF accession without version and underscore>
   while IFS=$'\t' read -r sp acc _path; do
     [[ -z "$sp" || "$sp" == \#* ]] && continue
-    r="$ARM/work/species_refs/REFSP_$sp/genes/$tag.fa"
+    r="$AMR/work/species_refs/REFSP_$sp/genes/$tag.fa"
     acc_id=${acc%.*}; acc_id=${acc_id//_/}   # GCF_002086675.1 -> GCF002086675
     [[ -e "$r" ]] && sed "1s/.*/>${tag}_REF_${sp}_${acc_id}/" "$r" >> "$in"
   done < "$CONFIG/species_refs.tsv"
   # control strains (LABEL set, e.g. Mkan329-126..133) first, then samples by species then id;
   # rows named <gene>_<id>_<species|abbreviated label>
-  python3 "$HERE/sort_samples.py" "$SCREENING_MAP_RESULTS" "$ARM/work/samples" "$tag" >> "$in"
+  python3 "$HERE/sort_samples.py" "$SCREENING_MAP_RESULTS" "$AMR/work/samples" "$tag" >> "$in"
   found=$(grep "^>" "$in" | grep -vc "^>${tag}_REF_" || true)
   if (( found == 0 )); then
     echo "[skip] $tag: reference only, no sample sequences"; continue

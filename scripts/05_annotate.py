@@ -41,7 +41,7 @@ every sample and is not a usable predictor; "yes" when the
 reference carries the wild-type allele; empty when the reference check is unavailable/suspect.
 
 Usage:
-  python3 05_annotate.py            # defaults: OUTPUT_ROOT/arm/{refs,work} (ARM_DIR overrides), ../config/markers.tsv
+  python3 05_annotate.py            # defaults: OUTPUT_ROOT/amr/{refs,work} (AMR_DIR overrides), ../config/markers.tsv
   python3 05_annotate.py --aln-dir DIR --refs DIR --markers markers.tsv \
       --resolved targets.resolved.tsv --outdir DIR
 """
@@ -61,7 +61,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # kansasii_paths.py sits next to this script
 from kansasii_paths import OUTPUT_ROOT, SCREENING_MAP_RESULTS, SPECIES  # noqa: E402
 
-ARM = Path(os.environ.get("ARM_DIR", OUTPUT_ROOT / "arm"))
+AMR = Path(os.environ.get("AMR_DIR", OUTPUT_ROOT / "amr"))
 CONFIG = Path(__file__).resolve().parent.parent / "config"
 
 SPECIES_REF_PREFIX = "REF_"  # other complex-species references (<gene>_REF_<species>_<GCF>); never called
@@ -248,12 +248,12 @@ def sample_qc(sample: str, tag: str, meta: dict[str, tuple[str, str]], samples_d
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--aln-dir", default=str(ARM / "work" / "aln"))
-    ap.add_argument("--refs", default=str(ARM / "refs"))
+    ap.add_argument("--aln-dir", default=str(AMR / "work" / "aln"))
+    ap.add_argument("--refs", default=str(AMR / "refs"))
     ap.add_argument("--markers", default=str(CONFIG / "markers.tsv"))
-    ap.add_argument("--resolved", default=str(ARM / "work" / "targets.resolved.tsv"))
-    ap.add_argument("--outdir", default=str(ARM / "work" / "report"))
-    ap.add_argument("--samples", default=str(ARM / "work" / "samples"))
+    ap.add_argument("--resolved", default=str(AMR / "work" / "targets.resolved.tsv"))
+    ap.add_argument("--outdir", default=str(AMR / "work" / "report"))
+    ap.add_argument("--samples", default=str(AMR / "work" / "samples"))
     ap.add_argument("--sample-meta", default=str(SCREENING_MAP_RESULTS))
     ap.add_argument("--min-ident", type=float, default=80.0,
                     help="minimum BLAST %% identity of the extracted gene to the reference gene "

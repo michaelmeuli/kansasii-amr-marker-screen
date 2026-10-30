@@ -12,7 +12,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 ACC=$ATCC12478_ACCESSION
 ASM=ASM15789v2
 BASE=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/157/895/${ACC}_${ASM}
-REFDIR=${1:-$ARM/refs}
+REFDIR=${1:-$AMR/refs}
 
 mkdir -p "$REFDIR"
 cd "$REFDIR"

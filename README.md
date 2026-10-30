@@ -24,12 +24,12 @@ with the grep command to investigate.
 ## Run
 
 Paths: reference downloads and all outputs live outside the repo in
-`OUTPUT_ROOT/arm/{refs,work}` (`output/arm`; override the whole dir with `ARM_DIR`, the root with `KANSASII_ROOT`).
+`OUTPUT_ROOT/amr/{refs,work}` (`output/amr`; override the whole dir with `AMR_DIR`, the root with `KANSASII_ROOT`).
 
 ```
-scripts/          01-08 numbered steps, run_arm.sh, run_arm_bam.sh, env.sh, sort_samples.py, backtranslate.py, kansasii_paths.py (shared constants, vendored)
+scripts/          01-08 numbered steps, run_amr.sh, run_amr_bam.sh, env.sh, sort_samples.py, backtranslate.py, kansasii_paths.py (shared constants, vendored)
 config/           markers.tsv (literature markers), targets.tsv (genes), species_refs.tsv (species -> accession)
-submit_arm.sbatch, submit_arm_reannot.sbatch, submit_arm_bam.sbatch
+submit_amr.sbatch, submit_amr_reannot.sbatch, submit_amr_bam.sbatch
 ```
 
 Shell steps source `scripts/env.sh`, which loads the shared `kansasii_paths.sh` (the same names as `kansasii_paths.py` in every repo:
@@ -41,14 +41,14 @@ Shell steps source `scripts/env.sh`, which loads the shared `kansasii_paths.sh` 
 
 ```bash
 conda env create -f environment.yml     # once: env_amr (samtools bcftools bedtools blast mafft)
-sbatch submit_arm.sbatch                # scripts/01 -> 02 -> 03 per new sample -> 03b -> 04 -> 05
-sbatch submit_arm_reannot.sbatch        # after the MIC analysis: 05 again (arm, amr_bam) -> 07 -> 08
+sbatch submit_amr.sbatch                # scripts/01 -> 02 -> 03 per new sample -> 03b -> 04 -> 05
+sbatch submit_amr_reannot.sbatch        # after the MIC analysis: 05 again (amr, amr_bam) -> 07 -> 08
 ```
 
 Call order (all in `scripts/`): `01_fetch_reference.sh`, `02_make_targets.py`, `03_sample_seqs.sh` (once per sample),
 `03b_species_refs.sh`, `04_align.sh`, `05_annotate.py`; read-mapping variant `06_bam_sample.sh`
 instead of 03 (see below); then `07_compare_modes.py` and `08_mut_with_mic.py`, which need both
-modes and `output/mic/`. `scripts/run_arm.sh` / `run_arm_bam.sh` do the first group.
+modes and `output/mic/`. `scripts/run_amr.sh` / `run_amr_bam.sh` do the first group.
 
 **Step by step** (deps: samtools bcftools bedtools blast mafft python3; macse optional):
 
@@ -66,10 +66,10 @@ python3 scripts/05_annotate.py
 
 Type check: `mypy` from the repo root (strict; see `pyproject.toml`).
 
-Then in Jalview: **File → Input Alignment** `$ARM_DIR/work/aln/<gene>.codon.aln.fasta`
-(coding genes) or `$ARM_DIR/work/aln/<gene>.nt.aln.fasta` (non-coding genes such as
+Then in Jalview: **File → Input Alignment** `$AMR_DIR/work/aln/<gene>.codon.aln.fasta`
+(coding genes) or `$AMR_DIR/work/aln/<gene>.nt.aln.fasta` (non-coding genes such as
 `rrl` and `rrs`, which have no codon alignment),
-then **File → Load Features** `$ARM_DIR/work/report/<gene>.jalview_features.txt`.
+then **File → Load Features** `$AMR_DIR/work/report/<gene>.jalview_features.txt`.
 Each marker nucleotide is coloured by the base the sequence carries (A green,
 C yellow-orange, G red, T blue, N/other grey), so a mutation shows as a colour change
 within the marker window. The evidence level is in the feature description (hover).
@@ -81,7 +81,7 @@ OTHER = neither wt nor mutant residue, DIFF = differs from the reference at a ma
 wt/mut letters. The reference row is shown only where it carries the mutant allele (MUT, with
 "ref carries mutant" in the description) or neither allele (OTHER).
 
-For scripted analysis use `$ARM_DIR/work/report/marker_calls.tsv`, one row per
+For scripted analysis use `$AMR_DIR/work/report/marker_calls.tsv`, one row per
 marker × sample with `differs` = YES / SYN / no / NOCALL:
 coding markers are compared at the amino-acid level (YES = residue differs from the
 reference, SYN = synonymous nucleotide change only), other markers at the nucleotide level;
@@ -145,11 +145,11 @@ species can give a misassembled or non-orthologous gene copy, which shows up as 
 independent of the assembly, so the same 54 markers can also be genotyped from the trimmed reads:
 
 ```bash
-scripts/run_arm_bam.sh prepare             # once: shared refs/ symlink, targets, bwa index
-sbatch --array=0-$(( $(ls $KANSASII_ROOT/runs/mkan329/assembly/results | wc -l) - 1 ))%20 submit_arm_bam.sbatch   # ASSEMBLIES
+scripts/run_amr_bam.sh prepare             # once: shared refs/ symlink, targets, bwa index
+sbatch --array=0-$(( $(ls $KANSASII_ROOT/runs/mkan329/assembly/results | wc -l) - 1 ))%20 submit_amr_bam.sbatch   # ASSEMBLIES
                                             # array, one task per sample (06_bam_sample.sh); the
                                             # default range 0-185 is the current 186 samples
-sbatch --wrap '...; scripts/run_arm_bam.sh finish'  # after the array: 04_align + 05_annotate (needs env_amr)
+sbatch --wrap '...; scripts/run_amr_bam.sh finish'  # after the array: 04_align + 05_annotate (needs env_amr)
 python3 scripts/07_compare_modes.py           # asm vs bam
 ```
 
@@ -157,7 +157,7 @@ python3 scripts/07_compare_modes.py           # asm vs bam
   to `refs/reference.fna`, then `03_sample_seqs.sh bam` (depth < `MIN_DEPTH` masked to N, minority
   alleles in `mixed_sites.tsv`). The full BAM is discarded; `bam/<ID>.targets.bam` keeps only the
   target regions.
-- Outputs go to `$KANSASII_ROOT/output/amr_bam` (`ARM_DIR`), so `output/arm` is untouched; `refs/`
+- Outputs go to `$KANSASII_ROOT/output/amr_bam` (`AMR_DIR`), so `output/amr` is untouched; `refs/`
   is shared via symlink. `marker_calls.tsv` has the same columns, except that `hit_pident` and
   `hit_cov` are empty (no BLAST step), so only the species/contamination QC applies.
 - The consensus is built per target region. A whole-genome consensus shifts coordinates after
@@ -218,7 +218,7 @@ time you run this. The consensus numbering paper for mycobacterial rpoB is
 ### `numbering_ref` values
 
 `numbering_ref` names the external sequence a marker's `position` is counted in.
-`01_fetch_reference.sh` downloads each one from NCBI into `$ARM_DIR/refs` as `<name>.fa`.
+`01_fetch_reference.sh` downloads each one from NCBI into `$AMR_DIR/refs` as `<name>.fa`.
 `MTB_GIDB_PROT`, for example, is *M. tuberculosis* H37Rv GidB (RsmG, Rv3919c,
 `NP_218436.1`), so gid E92D means residue 92 of that protein.
 

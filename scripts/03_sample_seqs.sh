@@ -17,9 +17,9 @@ MODE=${1:?mode: bam|asm}
 SAMPLE=${2:?sample id}
 INPUT=${3:?bam or contigs fasta}
 
-REF=$ARM/refs/reference.fna
-BED=$ARM/work/targets.bed
-OUT=${OUT_DIR:-$ARM/work/samples/$SAMPLE}   # OUT_DIR: used by 03b_species_refs.sh
+REF=$AMR/refs/reference.fna
+BED=$AMR/work/targets.bed
+OUT=${OUT_DIR:-$AMR/work/samples/$SAMPLE}   # OUT_DIR: used by 03b_species_refs.sh
 MIN_DEPTH=${MIN_DEPTH:-10}          # positions below this are masked to N
 MIN_IDENT=${MIN_IDENT:-85}          # asm mode: minimum blast identity
 mkdir -p "$OUT"
@@ -64,7 +64,7 @@ asm)
   mkdir -p "$OUT/blast"
   makeblastdb -in "$INPUT" -dbtype nucl -out "$OUT/blast/db" >/dev/null
   : > "$OUT/genes.raw.fa"
-  for g in "$ARM"/work/ref_genes/*.fa; do
+  for g in "$AMR"/work/ref_genes/*.fa; do
     tag=$(basename "$g" .fa)
     blastn -query "$g" -db "$OUT/blast/db" -max_target_seqs 5 \
       -outfmt '6 sseqid sstart send pident length qlen bitscore' \

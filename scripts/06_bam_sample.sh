@@ -2,9 +2,9 @@
 # 06_bam_sample.sh - read-mapping genotyping of one sample: map reads to refs/reference.fna,
 # extract the target genes (03_sample_seqs.sh bam), keep only a target-region BAM.
 #
-# Usage: ARM_DIR=<bam-mode dir> ./06_bam_sample.sh SAMPLE_ID [THREADS]
+# Usage: AMR_DIR=<bam-mode dir> ./06_bam_sample.sh SAMPLE_ID [THREADS]
 # Inputs : ASSEMBLIES/<id>/0_trimming/<id>_r{1,2}.fastq.gz
-# Outputs: $ARM/work/samples/<id>/ (as 03), $ARM/bam/<id>.targets.bam (+ .bai)
+# Outputs: $AMR/work/samples/<id>/ (as 03), $AMR/bam/<id>.targets.bam (+ .bai)
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 
@@ -12,10 +12,10 @@ ID=${1:?sample id}
 THREADS=${2:-${SLURM_CPUS_PER_TASK:-4}}
 command -v bwa >/dev/null 2>&1 || export PATH=$PATH:${CONDA_ENVS_DIR:-$HOME/data/conda/envs}/snippy/bin   # bwa lives in the snippy env
 R=$ASSEMBLIES/$ID/0_trimming
-REF=$ARM/refs/reference.fna
-mkdir -p "$ARM/bam"
+REF=$AMR/refs/reference.fna
+mkdir -p "$AMR/bam"
 
-[[ -s "$REF.bwt" ]] || { echo "index missing: run run_arm_bam.sh first" >&2; exit 1; }
+[[ -s "$REF.bwt" ]] || { echo "index missing: run run_amr_bam.sh first" >&2; exit 1; }
 TMP=$(mktemp -d "${TMPDIR:-/tmp}/amr_bam.XXXXXX"); trap 'rm -rf "$TMP"' EXIT
 
 bwa mem -t "$THREADS" "$REF" "$R/${ID}_r1.fastq.gz" "$R/${ID}_r2.fastq.gz" 2>/dev/null \
@@ -24,5 +24,5 @@ samtools index "$TMP/$ID.bam"
 
 "$HERE/03_sample_seqs.sh" bam "$ID" "$TMP/$ID.bam"
 
-samtools view -b -L "$ARM/work/targets.padded.bed" -o "$ARM/bam/$ID.targets.bam" "$TMP/$ID.bam"
-samtools index "$ARM/bam/$ID.targets.bam"
+samtools view -b -L "$AMR/work/targets.padded.bed" -o "$AMR/bam/$ID.targets.bam" "$TMP/$ID.bam"
+samtools index "$AMR/bam/$ID.targets.bam"

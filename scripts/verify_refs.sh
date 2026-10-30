@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# verify_refs.sh - check the numbering references in $ARM/refs against NCBI, and the
+# verify_refs.sh - check the numbering references in $AMR/refs against NCBI, and the
 # resolved target coordinates against the ATCC 12478 GFF. Prints a PASS/FAIL table.
 # Reads config/seq_refs.tsv (file, db, accession, range, ...). Needs network (NCBI efetch).
-# Usage: verify_refs.sh [OUTDIR]     (default $ARM/verify_refs; writes sequences.tsv, MANIFEST.txt)
+# Usage: verify_refs.sh [OUTDIR]     (default $AMR/verify_refs; writes sequences.tsv, MANIFEST.txt)
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 
-OUT=${1:-$ARM/verify_refs}
+OUT=${1:-$AMR/verify_refs}
 mkdir -p "$OUT"
 seqonly () { grep -v '>' "$1" | tr -d '\n\r ' ; }   # sequence without header/newlines
 
@@ -17,8 +17,8 @@ while IFS=$'\t' read -r file db acc range _; do
   url="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=$db&id=$acc&rettype=fasta&retmode=text"
   [[ "$range" != "-" ]] && url+="&seq_start=${range%-*}&seq_stop=${range#*-}"
   curl -fsSL "$url" -o "$OUT/$file.ncbi"
-  l=$(seqonly "$ARM/refs/$file"); n=$(seqonly "$OUT/$file.ncbi")
-  if [[ "$l" == "$n" ]] && head -1 "$ARM/refs/$file" | grep -q "^>$acc"; then st=PASS; else st=FAIL; fail=1; fi
+  l=$(seqonly "$AMR/refs/$file"); n=$(seqonly "$OUT/$file.ncbi")
+  if [[ "$l" == "$n" ]] && head -1 "$AMR/refs/$file" | grep -q "^>$acc"; then st=PASS; else st=FAIL; fail=1; fi
   printf "%s\t%s\t%d\t%d\t%s\t%s\n" "$file" "$acc" "${#l}" "${#n}" \
     "$(printf %s "$l" | sha256sum | cut -c1-16)" "$st" >> "$OUT/sequences.tsv"
   sleep 0.4   # NCBI: <= 3 requests/s without an API key
@@ -26,7 +26,7 @@ done < "$CONFIG/seq_refs.tsv"
 column -t -s$'\t' "$OUT/sequences.tsv"
 
 # every resolved target must sit on a GFF gene/rRNA feature with the same locus tag and coordinates
-python3 -I - "$ARM/work/targets.resolved.tsv" "$ARM/refs/reference.gff" "$OUT/targets.tsv" <<'PY' || fail=1
+python3 -I - "$AMR/work/targets.resolved.tsv" "$AMR/refs/reference.gff" "$OUT/targets.tsv" <<'PY' || fail=1
 import csv, re, sys
 res, gff, out = sys.argv[1:]
 feat = {}
@@ -48,5 +48,5 @@ print(f'targets: {bad} of the resolved rows do not match the GFF' if bad else 't
 sys.exit(1 if bad else 0)
 PY
 "${KANSASII_ROOT:-/shares/sander.imm.uzh/MM/kansasii}/repos/kansasii-docs/bin/write_manifest.sh" "$OUT" "$(dirname "$HERE")" scripts/verify_refs.sh \
-  "$CONFIG/seq_refs.tsv" "$ARM/refs" "$ARM/work/targets.resolved.tsv"
+  "$CONFIG/seq_refs.tsv" "$AMR/refs" "$AMR/work/targets.resolved.tsv"
 [[ $fail -eq 0 ]] && echo "ALL PASS" || { echo "SOME CHECKS FAILED (see $OUT)"; exit 1; }
