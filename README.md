@@ -282,8 +282,9 @@ not *M. kansasii* evidence.
 
 Not in the source meta-analysis but in CLSI's secondary panel for *M. kansasii*.
 Targets added: `rpsL`, `gid` (gidB/rsmG), plus the streptomycin positions in
-`rrs`. Note the rrs cluster II positions 1401/1402 sit inside the amikacin
-helix-44 window — a variant there should be interpreted for both drugs. The
+`rrs`. The rrs streptomycin hot spots in the literature are the 530 loop (513-517) and the
+912 region (904-912); positions 1401/1402 are listed too but no streptomycin source was found for them, and
+they sit inside the amikacin helix-44 window, so a variant there should be interpreted for both drugs. The
 only *M. kansasii*-specific observation is rrs A128G in a single isolate with
 streptomycin MIC >64 mg/L, which was never functionally confirmed.
 
