@@ -164,8 +164,11 @@ python3 scripts/07_compare_modes.py           # asm vs bam
   every upstream indel, so slicing it with reference coordinates gives the wrong codons.
 - `07_compare_modes.py` joins both `marker_calls.tsv` on gene x marker x sample and writes
   `mode_comparison.tsv` and `mode_disagreements.tsv` (classes `agree`, `disagree`, `asm_only`,
-  `bam_only`, `both_nocall`; NOCALL is never a call). On the 131 Mkan329 samples (BAM mode has not been rerun for the jc batch NR 134-186; assembly mode covers all 186): 3,550 shared
-  calls, 0 disagreements. Reads fill gaps where the assembly extraction was partial (rrl, rrs,
+  `bam_only`, `both_nocall`; NOCALL is never a call). Both modes cover all 186 samples (BAM mode rerun 2026-11-02, jc batch NR 134-186 included). Over all
+  186: 4,679 shared calls (`agree` 4,678, `disagree` 1), `asm_only` 360, `bam_only` 210, `both_nocall` 1,261. Restricted to the 171 included
+  clinical isolates (not `excluded`, no `LABEL`): 4,607 shared calls, 4,606 agree, `asm_only` 359, `bam_only` 202, `both_nocall` 817.
+  The one disagreement is the synonymous `gid` A205A position (`DO_NOT_CALL`) in Mkan329-181 (*M. ostraviense*): GGC from the
+  assembly, GCC from reads. Reads fill gaps where the assembly extraction was partial (rrl, rrs,
   gyrA); the assembly gives rrl/rrs calls where read mapping is NOCALL (mapping to the rRNA genes
   is not deep or unique enough).
 - Limits: reads are mapped to the ATCC 12478 reference, so divergent complex species map worse and
