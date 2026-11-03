@@ -277,7 +277,9 @@ not *M. kansasii* evidence.
    ([10.1128/AAC.01788-17](https://doi.org/10.1128/AAC.01788-17)). Efflux is the
    likely driver and is invisible to this pipeline.
 6. **Doxycycline and SXT are not genotypable today.** No validated markers
-   exist, despite 96% and 49% pooled phenotypic resistance.
+   exist for *M. kansasii*, although tetracyclines show poor activity against slowly growing
+   NTM including *M. kansasii* (Li 2023) and folP1/folP2 expression tracks SMX/TMP resistance in
+   *M. smegmatis* and *M. tuberculosis* (Liu 2015).
 7. This is a research tool. Nothing here is validated for clinical reporting;
    phenotypic DST remains the reference method.
 
