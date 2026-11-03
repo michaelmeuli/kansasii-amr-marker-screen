@@ -22,7 +22,7 @@ finish)
   "$HERE/03b_species_refs.sh"
   "$HERE/04_align.sh" "${SLURM_CPUS_PER_TASK:-4}"
   python3 "$HERE/05_annotate.py"
-  bash "$MANIFEST_SCRIPT" "$AMR" "$REPOS/kansasii-amr-marker-screen" run_amr_bam.sh   # provenance
+  bash "$MANIFEST_SCRIPT" "$AMR" "$REPOS/kansasii-amr-marker-screen" run_amr_bam.sh "$ASSEMBLIES" "$GTDB_REPRESENTATIVES" "$SCREENING_MAP_RESULTS"   # provenance
   ;;
 *) echo "usage: $0 prepare|finish" >&2; exit 1 ;;
 esac
