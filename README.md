@@ -227,7 +227,7 @@ time you run this. The consensus numbering paper for mycobacterial rpoB is
 
 | `numbering_ref` | Source | Used for |
 |---|---|---|
-| `MTB_RPOB_PROT`, `MTB_GYRB_PROT`, `MTB_RPSL_PROT`, `MTB_GIDB_PROT`, `MTB_RPLC_PROT`, `MTB_RPLD_PROT` | Mtb H37Rv proteins (RefSeq `NP_…`) | rpoB, gyrB, rpsL, gid, rplC, rplD |
+| `MTB_RPOB_PROT`, `MTB_GYRB_PROT`, `MTB_RPSL_PROT`, `MTB_GIDB_PROT`, `MTB_RPLC_PROT`, `MTB_RPLD_PROT`, `MTB_KATG_PROT`, `MTB_INHA_PROT` | Mtb H37Rv proteins (RefSeq `NP_…`) | rpoB, gyrB, rpsL, gid, rplC, rplD, katG, inhA |
 | `MAV_GYRA_PROT` | *M. avium* GyrA (`WP_011723278.1`) | gyrA D95/A91 fluoroquinolone numbering |
 | `ECOLI_16S_NT`, `ECOLI_23S_NT` | *E. coli* K-12 rRNA (`J01695.2` 1268..2809, `V00331.1`) | rrs, rrl |
 | `NONE` | no transfer | region scans, negative findings, study-specific coordinates |

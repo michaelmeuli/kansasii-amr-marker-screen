@@ -28,3 +28,5 @@ folC	sulfamethoxazole	folC	folylpolyglutamate synthase	CDS	100	NONE
 dfrA	trimethoprim	dfrA,folA	^dihydrofolate reductase$	CDS	100	NONE
 thyA	sulfamethoxazole,para-aminosalicylate	thyA	^thymidylate synthase$	CDS	100	NONE
 nucS	hypermutator	nucS,endMS	endonuclease.*NucS|mismatch.*endonuclease	CDS	100	NONE
+katG	isoniazid	katG	NONE	CDS	100	MTB_KATG_PROT
+inhA	isoniazid,ethionamide	inhA	NONE	CDS	200	MTB_INHA_PROT

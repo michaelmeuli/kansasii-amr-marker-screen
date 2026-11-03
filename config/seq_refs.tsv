@@ -7,4 +7,6 @@ MTB_RPSL_PROT.fa	protein	NP_215196.1	-	Mycobacterium tuberculosis H37Rv Rv0682	r
 MTB_GIDB_PROT.fa	protein	NP_218436.1	-	Mycobacterium tuberculosis H37Rv Rv3919c	gid
 MTB_RPLC_PROT.fa	protein	NP_215215.1	-	Mycobacterium tuberculosis H37Rv Rv0701	rplC
 MTB_RPLD_PROT.fa	protein	NP_215216.1	-	Mycobacterium tuberculosis H37Rv Rv0702	rplD
+MTB_KATG_PROT.fa	protein	NP_216424.1	-	Mycobacterium tuberculosis H37Rv Rv1908c	katG
+MTB_INHA_PROT.fa	protein	NP_216000.1	-	Mycobacterium tuberculosis H37Rv Rv1484	inhA
 MAV_GYRA_PROT.fa	protein	WP_011723278.1	-	Mycobacterium avium complex (MULTISPECIES)	gyrA
