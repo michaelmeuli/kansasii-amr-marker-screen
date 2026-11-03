@@ -209,7 +209,7 @@ Wild-type *M. kansasii* isolates are K43 (Lys, AAG) and the cohort's K43 isolate
 Almost nothing in `config/markers.tsv` is in *M. kansasii* coordinates:
 
 - rrl / rrs positions (2058, 2059, 1408, 903–906, 514) are **E. coli numbering**
-- rpoB, rpsL, gid, rplC, rplD, gyrB codons are **M. tuberculosis numbering**
+- rpoB, rpsL, gid, rplC, rplD, gyrB, katG, inhA codons are **M. tuberculosis numbering**
 - gyrA D95/A91 are **M. avium numbering** (= Mtb D94/A90)
 
 `05_annotate.py` converts each one by pairwise-aligning the M. kansasii gene to

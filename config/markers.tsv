@@ -52,3 +52,6 @@ linezolid	rplC	none	no correlation in RGM	NA	NONE	rapidly growing mycobacteria	N
 doxycycline	NA	none	NO VALIDATED MARKER	NA	NONE	M. kansasii	GAP	96% pooled resistance, no characterised mechanism. Use whiB7/tap as hypothesis-generating only	NA	proposed:li2023vitro
 sulfamethoxazole-trimethoprim	NA	none	NO VALIDATED MARKER	NA	NONE	M. kansasii	GAP	49% pooled resistance; no folP/dfrA/sul determinants published for mycobacteria	NA	proposed:liu2015role
 all	nucS	lof	loss of function	NA	NONE	M. abscessus	HYPERMUTATOR	10-22x higher resistance mutation rate; risk flag, not a resistance call	10.1128/spectrum.02228-22	fressatticardoso2022noncanonical
+isoniazid	katG	codon	S315T	315	MTB_KATG_PROT	M. tuberculosis	VALIDATED_OTHER_SPECIES	Dominant Mtb INH-R change (AGC>ACC); not shown in M. kansasii	10.1038/358591a0	zhang1992catalase
+isoniazid	inhA	codon	S94A	94	MTB_INHA_PROT	M. tuberculosis	VALIDATED_OTHER_SPECIES	Mtb; reduces NADH binding, INH and ETH cross-resistance	NA	NA
+ethionamide	inhA	codon	S94A	94	MTB_INHA_PROT	M. tuberculosis	VALIDATED_OTHER_SPECIES	Same variant as the INH row; ETH cross-resistance via InhA	10.1128/AAC.47.12.3799-3805.2003	morlock2003etha
