@@ -164,7 +164,7 @@ python3 scripts/07_compare_modes.py           # asm vs bam
   every upstream indel, so slicing it with reference coordinates gives the wrong codons.
 - `07_compare_modes.py` joins both `marker_calls.tsv` on gene x marker x sample and writes
   `mode_comparison.tsv` and `mode_disagreements.tsv` (classes `agree`, `disagree`, `asm_only`,
-  `bam_only`, `both_nocall`; NOCALL is never a call). Both modes cover all 186 samples (BAM mode rerun 2026-11-03, jc batch NR 134-186 included). Over all
+  `bam_only`, `both_nocall`; NOCALL is never a call). Both modes cover all 186 samples (runs of 2026-11-03). Over all
   186: 5,027 shared calls (`agree` 5,026, `disagree` 1), `asm_only` 360, `bam_only` 210, `both_nocall` 1,285. Restricted to the 171 included
   clinical isolates (not `excluded`, no `LABEL`): 4,949 shared calls, 4,948 agree, `asm_only` 359, `bam_only` 202, `both_nocall` 817.
   The one disagreement is the synonymous `gid` A205A position (`DO_NOT_CALL`) in Mkan329-181 (*M. ostraviense*): GGC from the
@@ -199,8 +199,8 @@ Wild-type *M. kansasii* isolates are K43 (Lys, AAG) and the cohort's K43 isolate
   this is a prediction, not a measurement.
 - **Mkan329-142 and 143 confirm it.** Both are K43R `MUT` (rrs A514C also `MUT`, as in every sample) and
   have streptomycin MIC `>64` mg/L in `data/imm/screening_map_ast_jc.csv` (NR_JC 47 / 46, TNR 2019500308 /
-  2019500326), a modified z-score of 4.27 against a cohort range of 0.5-16. They are the only K43R samples
-  with an STR MIC. The source value was entered as `<64` and corrected to `>64` on 2026-10-22 (treated as
+  2019500326), a modified z-score of 4.20 against a cohort range of 0.5-16. They are the only K43R samples
+  with an STR MIC. The `>64` is a hand correction of the delivered value `<64` (treated as
   a typo for the top of the tested range; the lab record was not checked), so this confirmation depends on
   that correction. No CLSI breakpoint exists for STR in NTM, so `STR_clsi_category` stays blank.
 
@@ -283,10 +283,10 @@ not *M. kansasii* evidence.
 7. This is a research tool. Nothing here is validated for clinical reporting;
    phenotypic DST remains the reference method.
 
-## Streptomycin (newly added)
+## Streptomycin
 
 Not in the source meta-analysis but in CLSI's secondary panel for *M. kansasii*.
-Targets added: `rpsL`, `gid` (gidB/rsmG), plus the streptomycin positions in
+Targets: `rpsL`, `gid` (gidB/rsmG), plus the streptomycin positions in
 `rrs`. The rrs streptomycin hot spots in the literature are the 530 loop (513-517) and the
 912 region (904-912); positions 1401/1402 are listed too but no streptomycin source was found for them, and
 they sit inside the amikacin helix-44 window, so a variant there should be interpreted for both drugs. The
