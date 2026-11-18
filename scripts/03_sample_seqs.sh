@@ -121,3 +121,9 @@ for line in open(src, encoding="utf-8"):
 flush()
 print(f"per-gene sequences for {sample} in {out}/genes/")
 PY
+# Stamp the target set this sample was extracted against (run_amr.sh / 03b: targets_done).
+if [[ "$MODE" == asm ]]; then
+  for g in "$AMR"/work/ref_genes/*.fa; do basename "$g" .fa; done
+else
+  cut -f4 "$BED"
+fi > "$OUT/targets.list"

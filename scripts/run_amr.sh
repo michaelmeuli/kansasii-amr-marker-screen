@@ -6,7 +6,7 @@
 # Inputs : ASSEMBLIES/<id>/1_unicycler/<id>.fasta (kansasii_paths.sh)
 # Outputs: $AMR_DIR (default OUT_AMR/results/assembly)/{refs,work}
 # Env    : MIN_DEPTH / MIN_IDENT as in 03_sample_seqs.sh; ASM_GLOB overrides the input glob.
-# Samples already present in work/samples/ are skipped (delete the dir to redo one);
+# Samples already extracted for every current target are skipped (delete the dir to redo one);
 # 04/05 always re-run on everything present.
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
@@ -21,7 +21,7 @@ n=0
 for fa in $ASM_GLOB; do
   [[ -e "$fa" ]] || { echo "no assemblies match: $ASM_GLOB" >&2; exit 1; }
   id=$(basename "$fa" .fasta)
-  if [[ -d "$AMR/work/samples/$id/genes" ]]; then echo "[skip] $id"; continue; fi
+  if targets_done "$AMR/work/samples/$id"; then echo "[skip] $id"; continue; fi
   "$HERE/03_sample_seqs.sh" asm "$id" "$fa"
   n=$((n+1))
 done

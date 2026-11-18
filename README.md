@@ -209,7 +209,12 @@ Wild-type *M. kansasii* isolates are K43 (Lys, AAG) and the cohort's K43 isolate
 Almost nothing in `config/markers.tsv` is in *M. kansasii* coordinates:
 
 - rrl / rrs positions (2058, 2059, 1408, 903–906, 514) are **E. coli numbering**
-- rpoB, rpsL, gid, rplC, rplD, gyrB, katG, inhA codons are **M. tuberculosis numbering**
+- rpoB, rpsL, gid, rplC, rplD, gyrB, katG, inhA, ethA, ethR codons are **M. tuberculosis numbering**
+- ethA/ethR have no gene name in the ATCC 12478 GFF; `targets.tsv` matches them by locus_tag
+  (MKAN_RS13735 = EthA, 87% aa identity to Mtb Rv3854c; MKAN_RS13740 = EthR, 83% to Rv3855;
+  divergent pair with a 76 bp shared intergenic region, as in Mtb). Another BVMO, MKAN_RS21445
+  (74%), is a paralog, not ethA. No literature markers yet: ethA resistance is scattered
+  loss of function, so read the alignment rather than `marker_calls.tsv`.
 - gyrA D95/A91 are **M. avium numbering** (= Mtb D94/A90)
 
 `05_annotate.py` converts each one by pairwise-aligning the M. kansasii gene to
@@ -227,7 +232,7 @@ time you run this. The consensus numbering paper for mycobacterial rpoB is
 
 | `numbering_ref` | Source | Used for |
 |---|---|---|
-| `MTB_RPOB_PROT`, `MTB_GYRB_PROT`, `MTB_RPSL_PROT`, `MTB_GIDB_PROT`, `MTB_RPLC_PROT`, `MTB_RPLD_PROT`, `MTB_KATG_PROT`, `MTB_INHA_PROT` | Mtb H37Rv proteins (RefSeq `NP_…`) | rpoB, gyrB, rpsL, gid, rplC, rplD, katG, inhA |
+| `MTB_RPOB_PROT`, `MTB_GYRB_PROT`, `MTB_RPSL_PROT`, `MTB_GIDB_PROT`, `MTB_RPLC_PROT`, `MTB_RPLD_PROT`, `MTB_KATG_PROT`, `MTB_INHA_PROT`, `MTB_ETHA_PROT`, `MTB_ETHR_PROT` | Mtb H37Rv proteins (RefSeq `NP_…`) | rpoB, gyrB, rpsL, gid, rplC, rplD, katG, inhA, ethA, ethR |
 | `MAV_GYRA_PROT` | *M. avium* GyrA (`WP_011723278.1`) | gyrA D95/A91 fluoroquinolone numbering |
 | `ECOLI_16S_NT`, `ECOLI_23S_NT` | *E. coli* K-12 rRNA (`J01695.2` 1268..2809, `V00331.1`) | rrs, rrl |
 | `NONE` | no transfer | region scans, negative findings, study-specific coordinates |

@@ -58,6 +58,8 @@ fetch_efetch "NP_215215.1"   protein MTB_RPLC_PROT.fa  # RplC  Rv0701
 fetch_efetch "NP_215216.1"   protein MTB_RPLD_PROT.fa  # RplD  Rv0702
 fetch_efetch "NP_216424.1"   protein MTB_KATG_PROT.fa  # KatG  Rv1908c
 fetch_efetch "NP_216000.1"   protein MTB_INHA_PROT.fa  # InhA  Rv1484
+fetch_efetch "NP_218371.1"   protein MTB_ETHA_PROT.fa  # EthA  Rv3854c
+fetch_efetch "NP_218372.1"   protein MTB_ETHR_PROT.fa  # EthR  Rv3855
 
 # M. avium GyrA - the numbering used by the D95/A91 fluoroquinolone literature
 fetch_efetch "WP_011723278.1" protein MAV_GYRA_PROT.fa

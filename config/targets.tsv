@@ -30,3 +30,5 @@ thyA	sulfamethoxazole,para-aminosalicylate	thyA	^thymidylate synthase$	CDS	100	N
 nucS	hypermutator	nucS,endMS	endonuclease.*NucS|mismatch.*endonuclease	CDS	100	NONE
 katG	isoniazid	katG	NONE	CDS	100	MTB_KATG_PROT
 inhA	isoniazid,ethionamide	inhA	NONE	CDS	200	MTB_INHA_PROT
+ethA	ethionamide	ethA,MKAN_RS13735	NONE	CDS	200	MTB_ETHA_PROT
+ethR	ethionamide	ethR,MKAN_RS13740	NONE	CDS	200	MTB_ETHR_PROT
